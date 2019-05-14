@@ -1,0 +1,26 @@
+@(wParams: java.util.Map[String, Array[String]])
+@import models.WeblapModell
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Weblap</title>
+</head>
+<body>
+@Html(WeblapModell.inic(wParams))
+<form>
+	<br>url<input name="url" value="@WeblapModell.getURL" size="100" @WeblapModell.urlEgyebAttr> <!--<br>host<input name="host" value="$host$">
+	<!-- kukik? -->
+	<br>s<input name="s" value="@WeblapModell.getS" @WeblapModell.sEgyebAttr>
+	<br><input type="submit" name="mehet" value="mehet">
+</form>
+<form target=_blank>
+	<input name=url type=hidden value="">
+	<input name=s type=hidden value="">
+	<input type="submit" name="mehet" value="csupasz">
+</form>
+
+@Html(WeblapModell.feldolg)
+
+</body>
+</html>

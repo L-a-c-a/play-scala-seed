@@ -1,0 +1,22 @@
+@(req: Request[AnyContent])
+<html>
+<pre>
+req
+rawQueryString: @req.rawQueryString
+queryString: @req.queryString
+body.asFormUrlEncoded: @req.body.asFormUrlEncoded
+body.asText: @req.body.asText
+uri: @req.uri
+path: @req.path
+host: @req.host
+remoteAddress: @req.remoteAddress
+secure: @req.secure
+toString: @req.toString
+
+</pre>
+
+<form action="req" method=post>
+<input type="text" name=a value=b>
+<input type="submit" name=s value=mehet>
+</form>
+</html>

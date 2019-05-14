@@ -1,0 +1,3 @@
+-ivy /home/laca/.ivy2
+-sbt-dir /home/laca/.sbt
+-sbt-boot /home/laca/.sbt/boot

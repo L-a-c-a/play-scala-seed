@@ -1,0 +1,18 @@
+logs
+target
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+/RUNNING_PID
+# eddig, gondolom, az eclipse-ifikáció (? - ahhoz korai a dátuma), innentől én
+/project/project
+#project/target  target már van fentebb
+tmp/
+#/sbt-dist helyett inkább (mert /sbt, /sbt.bat se kell):
+/sbt*
+/bin/
+/.g8/
+/.cache*
+*gradle*

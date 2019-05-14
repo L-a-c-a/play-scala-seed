@@ -1,0 +1,82 @@
+@(wParams: java.util.Map[String, Array[String]])
+@import models.WeblapModell
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Weblap ajaxszal</title>
+<script type="text/javascript">
+/*
+window.onbeforeunload = (function() { "alert('onbeforeunload')"; })
+window.onunload = (function() { "alert('onunload')"; })
+window.onpagehide = (function() { "alert('onpagehide')"; })
+nem működnek */
+</script>
+</head>
+<body>
+ <!-- 
+	onload="alert('load');"
+	onpageshow="alert('pageshow');"
+	onpagehide="alert('pagehide');"
+	onunload="alert('unload');"
+  -->
+ <!-- 
+<div id=ajaxform>ajaxform helye</div>  helyett .ajaxForm(wParams) (nem ajaxszal)
+  -->
+ <!--<a href="weblapajax">alapra</a>-->
+@Html(WeblapModell.ajaxAlapraForm(wParams))
+<div id=statusz></div>
+@Html(WeblapModell.ajaxForm(wParams))
+<script type="text/javascript">
+var ajaxobj = new XMLHttpRequest();
+
+function inicgomb()
+{
+	console.log('Inic meg van nyomva');
+	var formelemek = document.forms.inicform.elements;
+	//**/ console.log(  'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+	ajaxobj.open('GET', 'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+	ajaxobj.onreadystatechange = function()
+	{
+		console.log("inic folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.status + " " + ajaxobj.statusText);
+		//document.getElementById("statusz").innerHTML = "inic folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.statusText;
+		if (ajaxobj.readyState == 4)
+		{
+			//if (ajaxobj.status == 200)
+			{
+				document.getElementById("ajaxinic").innerHTML = ajaxobj.responseText;
+				document.getElementById("statusz").innerHTML = "inic kész, státusz=" + ajaxobj.statusText;
+			}
+			if (ajaxobj.status == 200) feldolggomb();
+		}
+	};
+	ajaxobj.send();
+	document.getElementById("statusz").innerHTML = "inic folyamatban...";
+}
+
+function feldolggomb()
+{
+	ajaxobj.open('GET', 'weblapajaxfeldolg?pill=' + document.getElementById('idoLong').innerHTML);
+	ajaxobj.onreadystatechange = function()
+	{
+		if (ajaxobj.readyState == 4)
+			//if (ajaxobj.status == 200)
+			{
+				document.getElementById("ajaxfeldolg").innerHTML = ajaxobj.responseText;
+				document.getElementById("statusz").innerHTML = "feldolg kész, státusz=" + ajaxobj.status;
+			}
+	};
+	ajaxobj.send();
+	document.getElementById("statusz").innerHTML = "feldolg folyamatban...";
+}
+</script>
+<div id=ajaxinic>ajaxinic kimenet helye</div>
+<button type="button" onclick="inicgomb()">Inic</button>
+<button type="button" onclick="console.log('Feldolg. meg van nyomva'); feldolggomb()">Feldolgozás</button>
+<div id=ajaxfeldolg>ajaxfeldolg helye</div>
+
+<!-- 
+@Html(WeblapModell.feldolg)
+ -->
+ 
+</body>
+</html>
