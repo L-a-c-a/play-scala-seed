@@ -26,6 +26,7 @@ public class WeblapSeCP extends WeblapSe
 		java.io.ByteArrayOutputStream rOS = new java.io.ByteArrayOutputStream();
 		ki = new java.io.PrintStream(rOS);
 
+		/*kiszervezve SajatFirefoxDriver-be
 		System.setProperty("webdriver.gecko.driver", driverHelye);
 		
 		//Set Firefox Headless mode as TRUE
@@ -34,6 +35,8 @@ public class WeblapSeCP extends WeblapSe
 		
 		//Instantiate Web Driver
 		WebDriver driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
+		*/
+		WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
 		JavascriptExecutor driverJS = (JavascriptExecutor)driver;
 
 		driver.get(url);

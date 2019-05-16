@@ -16,3 +16,5 @@ tmp/
 /.g8/
 /.cache*
 *gradle*
+/.worksheet
+# ez a scala worksheet (ws.sc) használatakor keletkezett

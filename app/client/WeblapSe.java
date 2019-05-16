@@ -23,25 +23,21 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 public class WeblapSe extends Weblap
 {
 
-	//final static String playhome = "/home/laca/play/"; //- a pici főrendszerén (egyelőre csak ide kell, aztál lehet, hogy majd globálisabb helyen kell definiálni
-	// de inkább: (Java.io.File) play.Environment.rootPath()
-	//final static String projhome = playhome+"play-java-seed/";
-	// play-specifikus (ott van ./public):
-	final static String driverHelye = "./public/geckodriver";  //ugyanis oda tettem (állítólag relatív is lehet, csak ./ -'el kezdődjön)
-	final static String tmpDir = "./public/tmp/"; // http-ben ez /assets/tmp/ (mármint play alatt, ld. routes)
 	
 	java.io.PrintStream ki = System.out;
-	
+
+	final static String tmpDir = "./public/tmp/"; // http-ben ez /assets/tmp/ (mármint play alatt, ld. routes)
+	// ha lesz SajatDriver a WebDriver és a Sajat{Firefox|...}Driver között, akkor ez oda kell, az AShot-os hívással együtt
+
 	String inicEredm = ""; // mert esetleg a konstruktor is feldolgoz, és majd a feldolg jeleníti meg (lehet, hogy feljebb kell)
 	
 	//de ha a driver mező, akkor mehet a feldolgozás a feldolg-ban
 	FirefoxOptions options = new FirefoxOptions();
 	
-	WebDriver driver ;//= (WebDriver) new FirefoxDriver(options);		mivel az options-t metódusban kell beállítani, ezért ezt is ott kell inicializálni
+	//WebDriver driver ;//= (WebDriver) new FirefoxDriver(options);		mivel az options-t metódusban kell beállítani, ezért ezt is ott kell inicializálni
 	
 	/* vagy a konstruktorból, vagy a seInic-ből
-	 * 
-	 */
+egyikből sem; kiszervezzük sajád osztályba, aztán new
 	void driverInic()
 	{
 		System.setProperty("webdriver.gecko.driver", driverHelye);
@@ -50,6 +46,8 @@ public class WeblapSe extends Weblap
 	//Instantiate Web Driver
 		driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
 	}
+	 */
+	WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
 	
 	@Override
 	public String getInicEredm() { return inicEredm; }
@@ -101,7 +99,7 @@ public class WeblapSe extends Weblap
 	{
 		super(wParams);
 		
-		driverInic();
+		//driverInic(); helyett new SajatFirefoxDriver(); a driver inicializálásában
 		seInic();
 	}
 	
