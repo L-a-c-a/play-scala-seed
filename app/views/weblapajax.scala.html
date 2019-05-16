@@ -33,7 +33,7 @@ function inicgomb()
 {
 	console.log('Inic meg van nyomva');
 	var formelemek = document.forms.inicform.elements;
-	//**/ console.log(  'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+	/**/ console.log(  'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
 	ajaxobj.open('GET', 'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
 	ajaxobj.onreadystatechange = function()
 	{
@@ -63,6 +63,9 @@ function feldolggomb()
 			{
 				document.getElementById("ajaxfeldolg").innerHTML = ajaxobj.responseText;
 				document.getElementById("statusz").innerHTML = "feldolg kész, státusz=" + ajaxobj.status;
+				//ha a képnek ugyanaz a címe, de megváltozott:
+				var kepElem = document.querySelector("#ajaxfeldolg img");  //attribútumra csak getter meg setter van, azért ilyen bonyolult
+				kepElem.setAttribute("src", kepElem.getAttribute("src") + "#" + document.getElementById('idoLong').innerHTML)
 			}
 	};
 	ajaxobj.send();
@@ -74,9 +77,9 @@ function feldolggomb()
 <button type="button" onclick="console.log('Feldolg. meg van nyomva'); feldolggomb()">Feldolgozás</button>
 <div id=ajaxfeldolg>ajaxfeldolg helye</div>
 
-<!-- 
+<!-- @*   twirl-ül is ki kell kommentelni!! (vagy csak úgy)
 @Html(WeblapModell.feldolg)
- -->
+*@ -->
  
 </body>
 </html>

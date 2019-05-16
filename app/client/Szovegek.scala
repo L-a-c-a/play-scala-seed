@@ -10,6 +10,6 @@ object Szovegek
 	$pluszelem
 </form>
 """
-
-	
+//így, hogy id=konstans, hülyeség
+//amúgy is scalából hülyeség idehivatkozni
 }

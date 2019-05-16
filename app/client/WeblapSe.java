@@ -33,6 +33,24 @@ public class WeblapSe extends Weblap
 	java.io.PrintStream ki = System.out;
 	
 	String inicEredm = ""; // mert esetleg a konstruktor is feldolgoz, és majd a feldolg jeleníti meg (lehet, hogy feljebb kell)
+	
+	//de ha a driver mező, akkor mehet a feldolgozás a feldolg-ban
+	FirefoxOptions options = new FirefoxOptions();
+	
+	WebDriver driver ;//= (WebDriver) new FirefoxDriver(options);		mivel az options-t metódusban kell beállítani, ezért ezt is ott kell inicializálni
+	
+	/* vagy a konstruktorból, vagy a seInic-ből
+	 * 
+	 */
+	void driverInic()
+	{
+		System.setProperty("webdriver.gecko.driver", driverHelye);
+	//Set Firefox Headless mode as TRUE
+		options.setHeadless(true);
+	//Instantiate Web Driver
+		driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
+	}
+	
 	@Override
 	public String getInicEredm() { return inicEredm; }
 	
@@ -53,29 +71,28 @@ public class WeblapSe extends Weblap
 							// /home/laca/play/play-java-seed/.
 							*/
 
-		System.setProperty("webdriver.gecko.driver", driverHelye);
+		// ld. driverInic
+		//System.setProperty("webdriver.gecko.driver", driverHelye);
 		//......további szívások leírása a jdk8_home docker-volumen alatti példányban
 		// ... de a legbiztosabb nem dockerben futtatni - csak sbt-t kellett installálni és megy
 		
 		//Set Firefox Headless mode as TRUE
-		FirefoxOptions options = new FirefoxOptions();
-		options.setHeadless(true);
+		//FirefoxOptions options = new FirefoxOptions();
+		//options.setHeadless(true);
 		
 		//Instantiate Web Driver
-		WebDriver driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
+		///*WebDriver*/ driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
+		/**/ System.out.println("driver.get hívás előtt url="+url);
 		driver.get(url);
 		ki.println("lapcím: " + driver.getTitle());
 		
 		//driver.save_screenshot("q.png");
-		driver.manage().window().maximize();  //nem igazán nagyítja ki
+		//driver.manage().window().maximize();  //nem igazán nagyítja ki
 		//File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
 		//try { FileUtils.copyFile(scrFile, new File(tmpDir + "screenshot.png")); } catch (IOException e1) { e1.printStackTrace(); }
-		//AShot:
-		Screenshot fpScreenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
-    try { ImageIO.write(fpScreenshot.getImage(),"PNG",new File(tmpDir + "screenshot.png")); }catch(IOException e1) { e1.printStackTrace(); }
+		//AShot:  átkerül a helyére, a feldolg()-ba
 
-
-		driver.close();
+		//driver.close(); nem itt!
 		
 		try { inicEredm = rOS.size() == 0 ? "rOS üres" : rOS.toString("UTF-8"); }catch (java.io.UnsupportedEncodingException e) {}
 	}
@@ -84,14 +101,27 @@ public class WeblapSe extends Weblap
 	{
 		super(wParams);
 		
+		driverInic();
 		seInic();
 	}
 	
 	@Override
 	public String feldolg()
 	{
+		/**/ System.out.println("WeblapSe.feldolg()meghívva");
+		//AShot:
+		Screenshot fpScreenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
+		try { ImageIO.write(fpScreenshot.getImage(),"PNG",new File(tmpDir + "screenshot.png")); }catch(IOException e1) { e1.printStackTrace(); }
+
 		return s + " Feldolgozás"
 				+ "<pre>" + inicEredm + "</pre>"
 				+ "<img src=assets/tmp/screenshot.png>";
 	}
+	
+	@Override
+	public void close()
+	{
+		driver.close();
+	}
+
 }

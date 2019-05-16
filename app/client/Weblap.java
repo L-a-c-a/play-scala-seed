@@ -31,5 +31,7 @@ public class Weblap
 	
 	public String urlEgyebAttr = "";   //további attr. az url form-input-mezőhöz, pl. readonly
 	public String sEgyebAttr = "";
+	
+	public void close() {}		//itt üres, de ide is kell, mert hátha a kontroller meghívja
 
 }
