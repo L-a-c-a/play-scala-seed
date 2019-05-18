@@ -3,16 +3,8 @@ package client;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class WeblapSeCP extends WeblapSe
 {
@@ -36,8 +28,9 @@ public class WeblapSeCP extends WeblapSe
 		//Instantiate Web Driver
 		WebDriver driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
 		*/
-		WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
-		JavascriptExecutor driverJS = (JavascriptExecutor)driver;
+		//WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
+		SajatDriver driver = new SajatDriver(); //a következő innentől felesleges
+		//JavascriptExecutor driverJS = /*(JavascriptExecutor)*/driver;
 
 		driver.get(url);
 
@@ -52,7 +45,7 @@ public class WeblapSeCP extends WeblapSe
 		Consumer <WebElement> szkriptenkent =
 				elem ->
 		{
-			String js = (String) driverJS.executeScript("return arguments[0].innerHTML;", elem);
+			String js = (String) driver/*JS*/.executeScript("return arguments[0].innerHTML;", elem);
 			//System.out.println(js);
 			/*
     (function() {

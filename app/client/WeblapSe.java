@@ -6,14 +6,6 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
@@ -31,9 +23,6 @@ public class WeblapSe extends Weblap
 
 	String inicEredm = ""; // mert esetleg a konstruktor is feldolgoz, és majd a feldolg jeleníti meg (lehet, hogy feljebb kell)
 	
-	//de ha a driver mező, akkor mehet a feldolgozás a feldolg-ban
-	FirefoxOptions options = new FirefoxOptions();
-	
 	//WebDriver driver ;//= (WebDriver) new FirefoxDriver(options);		mivel az options-t metódusban kell beállítani, ezért ezt is ott kell inicializálni
 	
 	/* vagy a konstruktorból, vagy a seInic-ből
@@ -47,7 +36,8 @@ egyikből sem; kiszervezzük sajád osztályba, aztán new
 		driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
 	}
 	 */
-	WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
+	//WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
+	SajatDriver driver = new SajatDriver();
 	
 	@Override
 	public String getInicEredm() { return inicEredm; }

@@ -18,3 +18,6 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2
 
 //innen én
 libraryDependencies += "ru.yandex.qatools.ashot" % "ashot" % "latest.integration"
+libraryDependencies += "org.seleniumhq.selenium" % "htmlunit-driver" % "latest.integration"
+// org.openqa.selenium.internal.Base64Encoder miatt (ScreenCaptureHtmlUnitDriver miatt):
+libraryDependencies += "org.seleniumhq.selenium" % "selenium-common" % "latest.integration"
