@@ -10,7 +10,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 //import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 /* ezt a play valamiért nem találja az ivy2-ben, pedig ott van
@@ -25,8 +24,11 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 public class SajatDriver implements WebDriver, JavascriptExecutor, TakesScreenshot
 {
-	//WebDriver sajatDriver = new SajatFirefoxDriver();
-	WebDriver sajatDriver = new /*Sajat*/HtmlUnitDriver(true);
+	WebDriver sajatDriver = new SajatFirefoxDriver();
+	//WebDriver sajatDriver = new /*Sajat*/HtmlUnitDriver(true); //de ez nem tud TakesScreenshot-ot
+	//WebDriver sajatDriver = new ScreenCaptureHtmlUnitDriver(true);
+	// nem ússzuk meg a SajatHtmlUnitDriver-t, mert a proxy-t be kell állítani, és azt minden driver-nél máshogy kell
+	//WebDriver sajatDriver = new SajatHtmlUnitDriver();
 	//na itt lehet típust változtatni
 
 /*
@@ -36,6 +38,12 @@ public class SajatDriver implements WebDriver, JavascriptExecutor, TakesScreensh
 	}
 ott az inicializálás
 */
+	public static org.openqa.selenium.Proxy sajatProxy = new org.openqa.selenium.Proxy()
+			.setHttpProxy("szusza:8118")
+			.setSslProxy("szusza:8118")
+			.setNoProxy("localhost, 127.0.0.1, szusza, pici, laca.no-ip.hu, 192.168.0.0/16");
+	// a Proxy "univerzális", csak a driver-hez rendelés driver-függő
+
 	@Override
 	public Object executeAsyncScript(String arg0, Object... arg1)
 	{

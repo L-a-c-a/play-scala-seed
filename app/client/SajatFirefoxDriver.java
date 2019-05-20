@@ -15,10 +15,18 @@ public class SajatFirefoxDriver extends FirefoxDriver
 	//static FirefoxOptions options = new FirefoxOptions();
 	private static FirefoxOptions driverInic() //super, mint első utasítás probléma megkerülése (static-nak kell lenni)
 	{
-		FirefoxOptions ret = new FirefoxOptions();
-		ret.setHeadless(true);
+		FirefoxOptions ffo = new FirefoxOptions();
+		ffo.setHeadless(true);
+/*
+		Proxy proxy = new Proxy(); 
+		proxy.setHttpProxy("szusza:8118")
+				.setSslProxy("szusza:8118")
+				.setNoProxy("localhost, 127.0.0.1, szusza, pici, laca.no-ip.hu, 192.168.0.0/16"); 
+		ffo.setProxy(proxy);
+*/
+		ffo.setProxy(SajatDriver.sajatProxy);
 		System.setProperty("webdriver.gecko.driver", driverHelye);
-		return ret;
+		return ffo;
 	}
 
 	public SajatFirefoxDriver()
