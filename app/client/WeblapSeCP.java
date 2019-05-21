@@ -29,7 +29,7 @@ public class WeblapSeCP extends WeblapSe
 		WebDriver driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
 		*/
 		//WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
-		SajatDriver driver = new SajatDriver(); //a következő innentől felesleges
+		SajatDriverC driver = new SajatDriverC(); //a következő innentől felesleges
 		//JavascriptExecutor driverJS = /*(JavascriptExecutor)*/driver;
 
 		driver.get(url);

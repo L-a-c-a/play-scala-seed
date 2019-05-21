@@ -13,15 +13,19 @@ object WeblapModell
 	var lap = new Weblap()
 	var tartosWeblapok = new scala.collection.mutable.HashMap[Long, Weblap]()	//ajaxoshoz
 	
+	var ffdrv: Option[SajatFirefoxDriver] = None
+	var hudrv: Option[SajatHtmlUnitDriver] = None
+
 	def inic (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek a .scala.html lapról
 	{
 		var s = ""
 		//s = wParams.get("s")(0)  //kiváltódik? - ki.
 		//try { s = wParams.get("s")(0) } catch {case e:NullPointerException => }   vagy: (miért nem mindig így csináltam...)
-		if (wParams.containsKey("s")) s = wParams.get("s")(0)
+		if (wParams.containsKey("s")) s = wParams.get("s")(0)		//vagy miért nem így: var s = (Option(wParams.get("s")) getOrElse Array(""))(0)
 		if (s=="Se")
 		{
-			lap = new WeblapSe(wParams)
+			if (ffdrv == None) ffdrv = Some(new SajatFirefoxDriver)
+			lap = new WeblapSe(wParams, ffdrv.get)
 			return "WeblapSe példányosítva" //+ "<br>" + lap.getInicEredm
 		}
 		if (s=="SeCP")

@@ -5,7 +5,7 @@ import org.openqa.selenium.Capabilities;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.webautomation.ScreenCaptureHtmlUnitDriver;
 
-public class SajatHtmlUnitDriver extends ScreenCaptureHtmlUnitDriver
+public class SajatHtmlUnitDriver extends ScreenCaptureHtmlUnitDriver implements SajatDriver
 {
 
 	public SajatHtmlUnitDriver()
@@ -13,7 +13,7 @@ public class SajatHtmlUnitDriver extends ScreenCaptureHtmlUnitDriver
 		super(true);
 		//this.setHTTPProxy("szusza", 8118, new java.util.ArrayList<String>(List.of("localhost", "127.0.0.1", "szusza", "pici", "laca.no-ip.hu", "192.168.0.0/16")));
 		//this.setProxy("szusza", 8118);
-		this.setProxySettings(SajatDriver.sajatProxy);
+		this.setProxySettings(sajatProxy);
 	}
 
 	public SajatHtmlUnitDriver(boolean enableJavascript)

@@ -37,7 +37,7 @@ egyikből sem; kiszervezzük sajád osztályba, aztán new
 	}
 	 */
 	//WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
-	SajatDriver driver = new SajatDriver();
+	SajatDriver driver; // = new SajatDriverC(); nem kell Weblap* példányonként egy böngésző
 	
 	@Override
 	public String getInicEredm() { return inicEredm; }
@@ -85,11 +85,18 @@ egyikből sem; kiszervezzük sajád osztályba, aztán new
 		try { inicEredm = rOS.size() == 0 ? "rOS üres" : rOS.toString("UTF-8"); }catch (java.io.UnsupportedEncodingException e) {}
 	}
 
-	public WeblapSe(Map<String, String[]> wParams)
+	public WeblapSe(Map<String, String[]> wParams)	//ellenjavallt (dekrepált), tessék kívülről driver-t adni
 	{
 		super(wParams);
 		
 		//driverInic(); helyett new SajatFirefoxDriver(); a driver inicializálásában
+		seInic();
+	}
+
+	public WeblapSe(Map<String, String[]> wParams, SajatDriver dr)
+	{
+		super(wParams);
+		driver = dr;
 		seInic();
 	}
 	
@@ -109,7 +116,7 @@ egyikből sem; kiszervezzük sajád osztályba, aztán new
 	@Override
 	public void close()
 	{
-		driver.close();
+		//driver.close();
 	}
 
 }
