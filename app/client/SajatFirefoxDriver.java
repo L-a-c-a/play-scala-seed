@@ -5,7 +5,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.firefox.XpiDriverService;
 
-public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver
+public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver  //csak az eclipse jelez hibát, a play-nek jó
 {
 	//final static String playhome = "/home/laca/play/"; //- a pici főrendszerén (egyelőre csak ide kell, aztál lehet, hogy majd globálisabb helyen kell definiálni
 	// de inkább: (Java.io.File) play.Environment.rootPath()
@@ -24,7 +24,7 @@ public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver
 				.setNoProxy("localhost, 127.0.0.1, szusza, pici, laca.no-ip.hu, 192.168.0.0/16"); 
 		ffo.setProxy(proxy);
 */
-		ffo.setProxy(sajatProxy);
+		ffo.setProxy(SajatDriver$.MODULE$.sajatProxy()); //így eszi csak meg: $.MODULE$. és () (társobjektumból egy val)
 		System.setProperty("webdriver.gecko.driver", driverHelye);
 		return ffo;
 	}

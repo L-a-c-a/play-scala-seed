@@ -6,6 +6,8 @@ import scala.collection.JavaConverters.mutableMapAsJavaMap
 
 import client._
 
+import SajatDriver._  // a client._ nem elég pl. a meghajtoNyit-ra való hivatkozáshoz
+
 object WeblapModell
 {
 	//var lap: Weblap = null //de aszongyák, kerüljük a nullt
@@ -15,35 +17,6 @@ object WeblapModell
 	
 	//var ffdrv: Option[SajatFirefoxDriver] = None
 	//var hudrv: Option[SajatHtmlUnitDriver] = None
-
-	object DrTip extends Enumeration
-	{
-		type DrTip = Value  //ez meg az import kell a meghajtok Map deklarálásához
-		val FFDR = Value
-		val HUDR = Value
-		//... stb, PHDR (Phantom), CHRDR, ...
-	}
-	import DrTip._
-	var meghajtok: scala.collection.mutable.Map[DrTip, SajatDriver] = scala.collection.mutable.Map.empty
-	//var meghajtoTipusok: scala.collection.mutable.Map[DrTip, SajatDriver.type] =
-
-	def ujMeghajtoTipusSzerint(tip: DrTip): SajatDriver =
-	{
-		tip match  //nem úszom meg (vagy nem érem föl ésszel, hogy úszom meg)
-		{
-			case FFDR => new SajatFirefoxDriver
-			case HUDR => new SajatHtmlUnitDriver
-			//...
-		}
-	}
-
-	def meghajtoNyit(tip: DrTip): SajatDriver =
-	{
-		if (!meghajtok.contains(tip)) meghajtok += (tip -> ujMeghajtoTipusSzerint(tip))
-		meghajtok(tip)
-	}
-
-	val aktMeghajtoTipus = FFDR  // <---- itt kell meghajtótípust változtatni!
 
 	def inic (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek a .scala.html lapról
 	{

@@ -4,7 +4,10 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
-public interface SajatDriver extends WebDriver, JavascriptExecutor, TakesScreenshot
+/*
+ * J mint Java, mert megscalásodik
+ */
+public interface SajatDriverJ extends WebDriver, JavascriptExecutor, TakesScreenshot
 {
 	public static org.openqa.selenium.Proxy sajatProxy = new org.openqa.selenium.Proxy()
 			.setHttpProxy("szusza:8118")
