@@ -13,8 +13,37 @@ object WeblapModell
 	var lap = new Weblap()
 	var tartosWeblapok = new scala.collection.mutable.HashMap[Long, Weblap]()	//ajaxoshoz
 	
-	var ffdrv: Option[SajatFirefoxDriver] = None
-	var hudrv: Option[SajatHtmlUnitDriver] = None
+	//var ffdrv: Option[SajatFirefoxDriver] = None
+	//var hudrv: Option[SajatHtmlUnitDriver] = None
+
+	object DrTip extends Enumeration
+	{
+		type DrTip = Value  //ez meg az import kell a meghajtok Map deklarálásához
+		val FFDR = Value
+		val HUDR = Value
+		//... stb, PHDR (Phantom), CHRDR, ...
+	}
+	import DrTip._
+	var meghajtok: scala.collection.mutable.Map[DrTip, SajatDriver] = scala.collection.mutable.Map.empty
+	//var meghajtoTipusok: scala.collection.mutable.Map[DrTip, SajatDriver.type] =
+
+	def ujMeghajtoTipusSzerint(tip: DrTip): SajatDriver =
+	{
+		tip match  //nem úszom meg (vagy nem érem föl ésszel, hogy úszom meg)
+		{
+			case FFDR => new SajatFirefoxDriver
+			case HUDR => new SajatHtmlUnitDriver
+			//...
+		}
+	}
+
+	def meghajtoNyit(tip: DrTip): SajatDriver =
+	{
+		if (!meghajtok.contains(tip)) meghajtok += (tip -> ujMeghajtoTipusSzerint(tip))
+		meghajtok(tip)
+	}
+
+	val aktMeghajtoTipus = FFDR  // <---- itt kell meghajtótípust változtatni!
 
 	def inic (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek a .scala.html lapról
 	{
@@ -24,8 +53,9 @@ object WeblapModell
 		if (wParams.containsKey("s")) s = wParams.get("s")(0)		//vagy miért nem így: var s = (Option(wParams.get("s")) getOrElse Array(""))(0)
 		if (s=="Se")
 		{
-			if (ffdrv == None) ffdrv = Some(new SajatFirefoxDriver)
-			lap = new WeblapSe(wParams, ffdrv.get)
+			//if (ffdrv == None) ffdrv = Some(new SajatFirefoxDriver)
+			//lap = new WeblapSe(wParams, ffdrv.get)
+			lap = new WeblapSe(wParams, meghajtoNyit(aktMeghajtoTipus))
 			return "WeblapSe példányosítva" //+ "<br>" + lap.getInicEredm
 		}
 		if (s=="SeCP")
@@ -98,16 +128,5 @@ object WeblapModell
 
 	def ajaxForm (wParams: Map[String, Array[String]]): String = ajaxForm(wParams, "id=inicform action=weblapajaxinic", "")
 	def ajaxAlapraForm (wParams: Map[String, Array[String]]): String = ajaxForm(wParams, "action=weblapajax", """<br><input type="submit" name="mehet" value="alapra">""")
-/*
-	def ajaxForm (wParams: Map[String, Array[String]], act: String, pluszelem: String): String =
-    Szovegek.cimForm( act  //action= a formba, lehet utána más is, pl. target=
-                    , if (wParams.containsKey("url")) wParams.get("url")(0) else ""
-                    , "" //további attribútum(ok) az url-hoz, pl. readonly
-                    , if (wParams.containsKey("s")) wParams.get("s")(0) else ""
-                    , ""
-                    , pluszelem //további inputok (pl. kuki), nyomógomb...
-                    )
-	def ajaxForm (wParams: Map[String, Array[String]]): String = ajaxForm(wParams, "weblapajaxinic", "")
-	def ajaxAlapraForm (wParams: Map[String, Array[String]]): String = ajaxForm(wParams, "weblapajax", """<br><input type="submit" name="mehet" value="alapra">""")
- */
+
 }
