@@ -18,20 +18,6 @@ public class WeblapSeCP extends WeblapSe
 		java.io.ByteArrayOutputStream rOS = new java.io.ByteArrayOutputStream();
 		ki = new java.io.PrintStream(rOS);
 
-		/*kiszervezve SajatFirefoxDriver-be
-		System.setProperty("webdriver.gecko.driver", driverHelye);
-		
-		//Set Firefox Headless mode as TRUE
-		FirefoxOptions options = new FirefoxOptions();
-		options.setHeadless(true);
-		
-		//Instantiate Web Driver
-		WebDriver driver = (WebDriver) new FirefoxDriver(options);		//eclipse kedvéért cast-olva, de a play-nek anélkül is jó
-		*/
-		//WebDriver driver = (WebDriver) new SajatFirefoxDriver(); //ez az egy meghajtó-típus-függés maradt itt - ez is lehet, hogy megy egy közbülső SajatDriver osztályba
-		SajatDriverC driver = new SajatDriverC(); //a következő innentől felesleges
-		//JavascriptExecutor driverJS = /*(JavascriptExecutor)*/driver;
-
 		driver.get(url);
 
 		//List<WebElement> lapok =driver.findElements(By.cssSelector("div.document_container div.outer_page"));
@@ -95,6 +81,13 @@ public class WeblapSeCP extends WeblapSe
 		sEgyebAttr = "readonly";
 		
 		//seCPInic();
+	}
+
+	public WeblapSeCP(Map<String, String[]> wParams, SajatDriver dr)
+	{
+		super(wParams, dr);
+		urlEgyebAttr = "readonly";
+		sEgyebAttr = "readonly";
 	}
 
 	@Override

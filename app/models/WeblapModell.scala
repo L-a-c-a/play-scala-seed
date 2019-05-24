@@ -14,9 +14,6 @@ object WeblapModell
 	//var lap = new Weblap(mutableMapAsJavaMap(collection.mutable.Map("" -> Array(""))))  //hát nesztek :)
 	var lap = new Weblap()
 	var tartosWeblapok = new scala.collection.mutable.HashMap[Long, Weblap]()	//ajaxoshoz
-	
-	//var ffdrv: Option[SajatFirefoxDriver] = None
-	//var hudrv: Option[SajatHtmlUnitDriver] = None
 
 	def inic (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek a .scala.html lapról
 	{
@@ -26,28 +23,23 @@ object WeblapModell
 		if (wParams.containsKey("s")) s = wParams.get("s")(0)		//vagy miért nem így: var s = (Option(wParams.get("s")) getOrElse Array(""))(0)
 		if (s=="Se")
 		{
-			//if (ffdrv == None) ffdrv = Some(new SajatFirefoxDriver)
-			//lap = new WeblapSe(wParams, ffdrv.get)
 			lap = new WeblapSe(wParams, meghajtoNyit(aktMeghajtoTipus))
+			//lap = new WeblapSe(wParams, SajatDriver(aktMeghajtoTipus))  nem műx; az explicit apply igen (amennyiben az = meghajtoNyit(_) )
 			return "WeblapSe példányosítva" //+ "<br>" + lap.getInicEredm
 		}
 		if (s=="SeCP")
 		{
 			wParams.put("url", Array("https://www.scribd.com/document/397870947/Gramatica-Quechua-Junin-Huanca-Rodolfo-Cerron-Palomino"))
-			lap = new WeblapSeCP(wParams)
+			lap = new WeblapSeCP(wParams, meghajtoNyit(aktMeghajtoTipus))
 			return "WeblapSeCP példányosítva"
 		}
 		lap = new Weblap(wParams)
-		//if (wParams.get("s")(0) == "qqq") return " qqq lap példányosítva"  //beszarás, műx! - így lehet s-től függő típusú weblapot példányosítani
-			//de ha nincs s paraméter, akkor NullPointerException
 		return "lap példányosítva"
 	}
 
 	def inicAjax (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek az ajaxos .scala.html lapról
 	{
 		var ret = inic(wParams)  //ettől lesz egy weblap a lap-ban
-		//var pill = //111111L  //helyett majd lesz a mostani időpillanat
-			//java.time.Instant.now.toEpochMilli
 		var pillInstant = java.time.Instant.now
 		var pill = pillInstant.toEpochMilli
 		tartosWeblapok.put(pill, lap)

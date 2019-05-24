@@ -11,8 +11,6 @@ public class SajatHtmlUnitDriver extends ScreenCaptureHtmlUnitDriver implements 
 	public SajatHtmlUnitDriver()
 	{
 		super(true);
-		//this.setHTTPProxy("szusza", 8118, new java.util.ArrayList<String>(List.of("localhost", "127.0.0.1", "szusza", "pici", "laca.no-ip.hu", "192.168.0.0/16")));
-		//this.setProxy("szusza", 8118);
 		this.setProxySettings(SajatDriver$.MODULE$.sajatProxy());
 	}
 

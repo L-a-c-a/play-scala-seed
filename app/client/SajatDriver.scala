@@ -40,13 +40,15 @@ object SajatDriver
 	}
 	//éppen ezt tanítják apply címszó alatt: http://allaboutscala.com/tutorials/chapter-5-traits/scala-traits-companion-object-factory-pattern/
 	//def apply(tip: DrTip): SajatDriver = ujMeghajtoTipusSzerint(tip)
-	def apply = ujMeghajtoTipusSzerint(_)
+	//def apply = ujMeghajtoTipusSzerint(_)  de itt ne ez legyen
 
 	def meghajtoNyit(tip: DrTip): SajatDriver =
 	{
 		if (!meghajtok.contains(tip)) meghajtok += (tip -> ujMeghajtoTipusSzerint(tip))
 		meghajtok(tip)
 	}
+	// ...hanem:
+	def apply = meghajtoNyit(_)   //innentől SajatDriver(tip) -'el lehet példányosítani
 
 	val aktMeghajtoTipus = FFDR  // <---- itt kell meghajtótípust változtatni!
 
