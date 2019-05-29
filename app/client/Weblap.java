@@ -33,5 +33,18 @@ public class Weblap
 	public String sEgyebAttr = "";
 	
 	public void close() {}		//itt üres, de ide is kell, mert hátha a kontroller meghívja
+	
+	//hátha javában is működik
+	public static Weblap apply(Map<String, String[]> wParams, String s)
+	{
+		switch(s)
+		{
+		case "Se": return new WeblapSe(wParams, SajatDriver.meghajtoNyit(SajatDriver.aktMeghajtoTipus()));
+		case "SeCP": 
+			wParams.put("url", new String[] {"https://www.scribd.com/document/397870947/Gramatica-Quechua-Junin-Huanca-Rodolfo-Cerron-Palomino"});
+			return new WeblapSeCP(wParams, SajatDriver.meghajtoNyit(SajatDriver.aktMeghajtoTipus()));
+		default: return new Weblap(wParams);
+		}
+	}
 
 }

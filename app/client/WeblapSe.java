@@ -3,12 +3,18 @@ package client;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.imageio.ImageIO;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+
+import java.util.Map;
 
 public class WeblapSe extends Weblap
 {
@@ -45,6 +51,34 @@ public class WeblapSe extends Weblap
 		seInic();
 	}
 
+	public String linkek()
+	{
+		//String[] ret = {""};
+		Function<WebElement, String> elembolHtmlMap =
+				elem ->
+		{
+			return elem.getAttribute("href")
+					+  " "
+					+  elem.getText()
+					+ "<button class=alacsonygomb onclick='inicajaxhivas(\"weblapajaxinic?url=" + elem.getAttribute("href") + "&s=" + s + "\")'>nyomjad</button>"
+					+ "<br>";
+		};
+		return driver.findElements(By.cssSelector("a[href]"))
+				.stream()
+				.map(elembolHtmlMap)
+				.reduce("", (a,b)->a+b);
+/*
+		driver.findElements(By.cssSelector("a[href]")).forEach
+		(
+			elem ->
+			{
+.........................
+			}
+		);
+		return ret[0];
+*/
+	}
+
 	public WeblapSe(Map<String, String[]> wParams, SajatDriver dr)
 	{
 		super(wParams);
@@ -62,7 +96,8 @@ public class WeblapSe extends Weblap
 
 		return s + " Feldolgozás"
 				+ "<pre>" + inicEredm + "</pre>"
-				+ "<img src=assets/tmp/screenshot.png>";
+				+ "<div class=korlatozottmagassag1000>" + linkek() + "</div>"
+				+ "<img src=assets/tmp/screenshot.png#" + java.time.Instant.now().toEpochMilli() + ">";
 	}
 	
 	@Override

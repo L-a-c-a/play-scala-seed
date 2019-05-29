@@ -14,6 +14,31 @@ object WeblapModell
 	//var lap = new Weblap(mutableMapAsJavaMap(collection.mutable.Map("" -> Array(""))))  //hát nesztek :)
 	var lap = new Weblap()
 	var tartosWeblapok = new scala.collection.mutable.HashMap[Long, Weblap]()	//ajaxoshoz
+	
+	def tartosWeblapokStatusz: String =
+	{
+/*
+		//def tartosWeblapbolHtml(sor:Tuple2[Long,Weblap]) =
+		def tartosWeblapbolHtml(sor:(Long,Weblap)) =
+		{
+			val pill=sor._1
+			val lap=sor._2
+			s"""$pill ${java.time.Instant.ofEpochMilli(pill)}
+					|<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
+					|<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
+					|""".stripMargin
+		}
+*/
+		tartosWeblapok
+		//.map(tartosWeblapbolHtml)  na, ehelyett van a case		https://twitter.github.io/scala_school/collections.html#vsMap
+		.map{ case (pill, lap) =>		//még csak zárójelbe se kell tenni a {...}-t
+					s"""$pill ${java.time.Instant.ofEpochMilli(pill)}
+							|<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
+							|<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
+							|""".stripMargin
+				}
+		.foldLeft("<br>")(_ + "<br>" + _)
+	}
 
 	def inic (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek a .scala.html lapról
 	{
@@ -21,20 +46,25 @@ object WeblapModell
 		//s = wParams.get("s")(0)  //kiváltódik? - ki.
 		//try { s = wParams.get("s")(0) } catch {case e:NullPointerException => }   vagy: (miért nem mindig így csináltam...)
 		if (wParams.containsKey("s")) s = wParams.get("s")(0)		//vagy miért nem így: var s = (Option(wParams.get("s")) getOrElse Array(""))(0)
+/*
 		if (s=="Se")
 		{
 			lap = new WeblapSe(wParams, meghajtoNyit(aktMeghajtoTipus))
 			//lap = new WeblapSe(wParams, SajatDriver(aktMeghajtoTipus))  nem műx; az explicit apply igen (amennyiben az = meghajtoNyit(_) )
-			return "WeblapSe példányosítva" //+ "<br>" + lap.getInicEredm
+			return lap.getClass + " példányosítva" //+ "<br>" + lap.getInicEredm
 		}
 		if (s=="SeCP")
 		{
 			wParams.put("url", Array("https://www.scribd.com/document/397870947/Gramatica-Quechua-Junin-Huanca-Rodolfo-Cerron-Palomino"))
 			lap = new WeblapSeCP(wParams, meghajtoNyit(aktMeghajtoTipus))
-			return "WeblapSeCP példányosítva"
+			return lap.getClass + " példányosítva"
 		}
 		lap = new Weblap(wParams)
-		return "lap példányosítva"
+		return lap.getClass + " példányosítva"
+* átment Weblap.apply()-ba
+*/
+		lap = Weblap.apply(wParams, s)		// Weblap(wParams, s) nem műx: class client.Weblap is not a value
+		lap.getClass + " példányosítva"
 	}
 
 	def inicAjax (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek az ajaxos .scala.html lapról
@@ -49,10 +79,19 @@ object WeblapModell
 	def feldolg /*(wParams: Map[String, Array[String]]): String*/ = lap.feldolg
 	// de valsz. nem kell neki a paraméter, mert már az inic-kor eltette magának
 	
+	def feldolg(pill: Long, muvelet: String): String =
+	{
+		muvelet match
+		{
+			case "csuk" => csuk(pill)
+			case _ => feldolg(pill)
+		}
+	}
+
 	def feldolg(pill: Long): String =
 	{
 		//var ret = if (tartosWeblapok.contains(pill)) tartosWeblapok.apply(pill).feldolg else s"nincs már $pill kulcsú objektum a listában" - ez nem jó, ha több utasítás kell a then-ágba
-		var ret = s"nincs már $pill kulcsú objektum a listában"
+		var ret = s"nincs már $pill kulcsú objektum a listában" + tartosWeblapokStatusz
 		if (!tartosWeblapok.contains(pill)) return ret	// ehhez kell a : String is felül
 		//és innen már van tartosWeblapok[pill]
 		 println (s"modell.feldolg($pill) hívás");
@@ -61,12 +100,19 @@ object WeblapModell
 		lap.close()
 		//lehet, hogy scalátlan, de világos
 		
+		ret + tartosWeblapokStatusz
+	}
+
+	def csuk(pill: Long) =
+	{
 		//ezt lehet, külön tagba kéne tenni, amit az ajaxos .scala.html lap explicite hív (onunload-ból?):
 		tartosWeblapok -= pill
 		println(s"${tartosWeblapok.size} eleme van még a listának")
-		ret
+		( s"$pill csukva" 
+		+ tartosWeblapokStatusz
+		)
 	}
-	
+
 	def getURL = lap.getURL
 	def getS = lap.getS
 	def urlEgyebAttr = lap.urlEgyebAttr

@@ -31,7 +31,7 @@ object SajatDriver
 
 	def ujMeghajtoTipusSzerint(tip: DrTip): SajatDriver =
 	{
-		tip match  //nem úszom meg (vagy nem érem föl ésszel, hogy úszom meg)
+		tip match
 		{
 			case FFDR => new SajatFirefoxDriver
 			case HUDR => new SajatHtmlUnitDriver
@@ -48,7 +48,7 @@ object SajatDriver
 		meghajtok(tip)
 	}
 	// ...hanem:
-	def apply = meghajtoNyit(_)   //innentől SajatDriver(tip) -'el lehet példányosítani
+	def apply = meghajtoNyit(_)   //innentől SajatDriver(tip) -'el lehet példányosítani - elvileg
 
 	val aktMeghajtoTipus = FFDR  // <---- itt kell meghajtótípust változtatni!
 

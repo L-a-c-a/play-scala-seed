@@ -11,6 +11,38 @@ window.onunload = (function() { "alert('onunload')"; })
 window.onpagehide = (function() { "alert('onpagehide')"; })
 nem működnek */
 </script>
+
+<style>
+.feldobos
+{
+	position: relative;
+	display: inline-block;
+}
+.feldobosbavalo
+{
+	display: none;
+	height: 200px;
+	overflow-y: auto;
+}
+.feldobos:hover .feldobosbavalo
+{
+	display: block;
+}
+
+div.korlatozottmagassag1000
+{
+	width: 80%;	/*csak nyolcvan, hogy lehessen mellette letekerni*/
+	margin: auto; /*méghozzá kétoldalt*/
+	max-height: 1000px;
+	overflow-y: auto;
+}
+
+.alacsonygomb
+{
+	height: 16px;
+	font-size: 0.5em;
+}
+</style>
 </head>
 <body>
  <!-- 
@@ -33,8 +65,14 @@ function inicgomb()
 {
 	console.log('Inic meg van nyomva');
 	var formelemek = document.forms.inicform.elements;
-	/**/ console.log(  'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
-	ajaxobj.open('GET', 'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+	//**/ console.log(  'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+	inicajaxhivas('weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+}
+
+function inicajaxhivas(cim)
+{
+	/**/ console.log("inicajaxhivas cim="+cim)
+	ajaxobj.open('GET', cim);
 	ajaxobj.onreadystatechange = function()
 	{
 		console.log("inic folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.status + " " + ajaxobj.statusText);
@@ -46,26 +84,32 @@ function inicgomb()
 				document.getElementById("ajaxinic").innerHTML = ajaxobj.responseText;
 				document.getElementById("statusz").innerHTML = "inic kész, státusz=" + ajaxobj.statusText;
 			}
-			if (ajaxobj.status == 200) feldolggomb();
+			if (ajaxobj.status == 200) feldolggomb('');
 		}
 	};
 	ajaxobj.send();
 	document.getElementById("statusz").innerHTML = "inic folyamatban...";
 }
 
-function feldolggomb()
+function feldolggomb(pluszpar)
 {
-	ajaxobj.open('GET', 'weblapajaxfeldolg?pill=' + document.getElementById('idoLong').innerHTML);
+	feldolgajaxhivas(document.getElementById('idoLong').innerHTML, pluszpar);
+}
+
+function feldolgajaxhivas(pill, pluszpar)
+{
+	ajaxobj.open('GET', 'weblapajaxfeldolg?pill=' + pill + pluszpar);
 	ajaxobj.onreadystatechange = function()
 	{
+		console.log("feldolg folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.status + " " + ajaxobj.statusText);
 		if (ajaxobj.readyState == 4)
 			//if (ajaxobj.status == 200)
 			{
 				document.getElementById("ajaxfeldolg").innerHTML = ajaxobj.responseText;
 				document.getElementById("statusz").innerHTML = "feldolg kész, státusz=" + ajaxobj.status;
-				//ha a képnek ugyanaz a címe, de megváltozott:
-				var kepElem = document.querySelector("#ajaxfeldolg img");  //attribútumra csak getter meg setter van, azért ilyen bonyolult
-				kepElem.setAttribute("src", kepElem.getAttribute("src") + "#" + document.getElementById('idoLong').innerHTML)
+				//ha a képnek ugyanaz a címe, de megváltozott: (de ezt lehet, hogy a hívóból kéne intézni)
+				//var kepElem = document.querySelector("#ajaxfeldolg img");  //attribútumra csak getter meg setter van, azért ilyen bonyolult
+				//if (kepElem) kepElem.setAttribute("src", kepElem.getAttribute("src") + "#" + document.getElementById('idoLong').innerHTML)
 			}
 	};
 	ajaxobj.send();
@@ -74,7 +118,8 @@ function feldolggomb()
 </script>
 <div id=ajaxinic>ajaxinic kimenet helye</div>
 <button type="button" onclick="inicgomb()">Inic</button>
-<button type="button" onclick="console.log('Feldolg. meg van nyomva'); feldolggomb()">Feldolgozás</button>
+<button type="button" onclick="console.log('Feldolg. meg van nyomva'); feldolggomb('')">Feldolgozás</button>
+<button type="button" onclick="feldolggomb('&muvelet=csuk')">Csuk</button>
 <div id=ajaxfeldolg>ajaxfeldolg helye</div>
 
 <!-- @*   twirl-ül is ki kell kommentelni!! (vagy csak úgy)
