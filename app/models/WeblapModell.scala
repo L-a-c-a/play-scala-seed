@@ -32,7 +32,7 @@ object WeblapModell
 		tartosWeblapok
 		//.map(tartosWeblapbolHtml)  na, ehelyett van a case		https://twitter.github.io/scala_school/collections.html#vsMap
 		.map{ case (pill, lap) =>		//még csak zárójelbe se kell tenni a {...}-t
-					s"""$pill ${java.time.Instant.ofEpochMilli(pill)}
+					s"""$pill ${java.time.Instant.ofEpochMilli(pill)} ${lap.getS} ${lap.getURL}
 							|<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
 							|<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
 							|""".stripMargin
@@ -84,6 +84,7 @@ object WeblapModell
 		muvelet match
 		{
 			case "csuk" => csuk(pill)
+			case "statusz" => tartosWeblapokStatusz
 			case _ => feldolg(pill)
 		}
 	}
@@ -97,7 +98,7 @@ object WeblapModell
 		 println (s"modell.feldolg($pill) hívás");
 		lap = tartosWeblapok.apply(pill)
 		ret = lap.feldolg()
-		lap.close()
+		//lap.close()
 		//lehet, hogy scalátlan, de világos
 		
 		ret + tartosWeblapokStatusz
@@ -106,6 +107,7 @@ object WeblapModell
 	def csuk(pill: Long) =
 	{
 		//ezt lehet, külön tagba kéne tenni, amit az ajaxos .scala.html lap explicite hív (onunload-ból?):
+		tartosWeblapok(pill).close()
 		tartosWeblapok -= pill
 		println(s"${tartosWeblapok.size} eleme van még a listának")
 		( s"$pill csukva" 

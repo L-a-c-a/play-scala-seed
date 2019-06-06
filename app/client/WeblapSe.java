@@ -1,7 +1,12 @@
 package client;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.time.Instant;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -13,8 +18,6 @@ import org.openqa.selenium.WebElement;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
-
-import java.util.Map;
 
 public class WeblapSe extends Weblap
 {
@@ -28,9 +31,17 @@ public class WeblapSe extends Weblap
 	
 	SajatDriver driver; // = new SajatDriverC(); nem kell Weblap* példányonként egy böngésző
 	
+	//2 ideiglenes fájl
+  String tmpKepFajl = "";
+  String tmpHtmlFajl = "";
+  
+  String linkek = "";
+	
 	@Override
 	public String getInicEredm() { return inicEredm; }
 	
+	Instant feldolgPill;
+
 	public void seInic() //output az inicEredm-ben; konstruktor hívja, azért void
 	{
 		java.io.ByteArrayOutputStream rOS = new java.io.ByteArrayOutputStream();
@@ -39,6 +50,10 @@ public class WeblapSe extends Weblap
 		/**/ System.out.println("driver.get hívás előtt url="+url);
 		driver.get(url);
 		ki.println("lapcím: " + driver.getTitle());
+
+		docHtml = driver.getPageSource();
+		
+		linkek = linkek(); // ezt inickor kell
 
 		try { inicEredm = rOS.size() == 0 ? "rOS üres" : rOS.toString("UTF-8"); }catch (java.io.UnsupportedEncodingException e) {}
 	}
@@ -89,21 +104,78 @@ public class WeblapSe extends Weblap
 	@Override
 	public String feldolg()
 	{
-		/**/ System.out.println("WeblapSe.feldolg()meghívva");
-		//AShot:
-		Screenshot fpScreenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
-		try { ImageIO.write(fpScreenshot.getImage(),"PNG",new File(tmpDir + "screenshot.png")); }catch(IOException e1) { e1.printStackTrace(); }
+	  feldolgPill = Instant.now();
+	  Long pill = feldolgPill.toEpochMilli();
+		/**/ System.out.println("WeblapSe.feldolg() meghívva " + pill + " " + feldolgPill);
+		
+		String kepfajl = "screenshot" + pill + ".png";
+		String htmlfajl = "drpagesource" + pill + ".html";
+		
+		if (tmpKepFajl.isEmpty())
+		{
+	    //AShot:
+	    Screenshot fpScreenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
+	    try { ImageIO.write(fpScreenshot.getImage(),"PNG",new File(tmpDir + kepfajl)); }catch(IOException e1) { e1.printStackTrace(); }
+	    tmpKepFajl = kepfajl;
+		}else
+		  kepfajl = tmpKepFajl + "#" + pill;  //ua. a fájl friss címmel, hogy ne a cache-ből tudjisten mit vegyen elő
 
-		return s + " Feldolgozás"
-				+ "<pre>" + inicEredm + "</pre>"
-				+ "<div class=korlatozottmagassag1000>" + linkek() + "</div>"
-				+ "<img src=assets/tmp/screenshot.png#" + java.time.Instant.now().toEpochMilli() + ">";
-	}
+    java.util.function.BiConsumer<String, String> fajlbair =
+        (szoveg, fajl) ->
+        {
+          try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fajl), "utf-8")))
+          {
+            writer.write(szoveg);
+          } catch (IOException e) { e.printStackTrace(); }
+        };
+/*
+    //HTML forrás egyikféleképpen
+    docHtml = driver.getPageSource();
+    fajlbair.accept(docHtml, tmpDir + "drpagesource.html");
+    //HTML forrás másikféleképpen
+    docHtml = (String)driver.executeScript("return document.documentElement.outerHTML;");
+    fajlbair.accept(docHtml, tmpDir + "drexejs.html");
+    //a kettő ugyanaz még nagyon js-súlyos lapoknál is
+*/
+    if (tmpHtmlFajl.isEmpty())
+    {
+      fajlbair.accept(docHtml, tmpDir + htmlfajl);
+      tmpHtmlFajl = htmlfajl;
+    }else
+      htmlfajl = tmpHtmlFajl + "#" + pill;
+    
+
+    return s + " Feldolgozás"
+        + "<pre>" + inicEredm + "</pre>"
+        + "<div class=korlatozottmagassag1000>" + linkek + "</div>"
+        //+ "<img src=assets/tmp/screenshot" + pill + ".png>" helyett, http://qnimate.com/tabbed-area-using-html-and-css-only/ -ból smart insert módban idemásolva:
+            + "<div class=\"tabs\">\n" + 
+            "    <div class=\"tab\">\n" + 
+            "      <input name=\"checkbox-tabs-group\" type=\"radio\" id=\"checkbox1\" class=\"checkboxtab\" checked>\n" + 
+            "      <label for=\"checkbox1\">Kép</label>\n" + 
+            "      <div class=\"content\">\n" + 
+            "        <img src=assets/tmp/" + kepfajl + ">\n" + 
+            "      </div>\n" + 
+            "    </div>\n" + 
+            "    \n" + 
+            "    <div class=\"tab\">\n" + 
+            "      <input name=\"checkbox-tabs-group\" type=\"radio\" id=\"checkbox2\" class=\"checkboxtab\">\n" + 
+            "      <label for=\"checkbox2\">Forrás</label>\n" + 
+            "      <div class=\"content\">\n" + 
+            "        <iframe src=assets/tmp/" + htmlfajl + " style=\"flex-grow: 1; width: 100%;\"></iframe>\n" + 
+            "      </div>\n" + 
+            "    </div>\n" + 
+            "    \n" + 
+            "  </div>\n";
+  }
 	
 	@Override
 	public void close()
 	{
 		//driver.close();
+		//ideigl. fájlokat törölni?
+    tmpKepFajl = "";
+    tmpHtmlFajl = "";
 	}
 
 }

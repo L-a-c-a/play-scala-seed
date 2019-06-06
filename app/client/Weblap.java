@@ -6,6 +6,8 @@ public class Weblap
 {
 	String url = "";
 	public String getURL() { return url; }
+
+	String docHtml = ""; //html forrás
 	
 	String s = "";
 	public String getS() { return s; }

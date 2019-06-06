@@ -42,6 +42,52 @@ div.korlatozottmagassag1000
 	height: 16px;
 	font-size: 0.5em;
 }
+
+/* füles div, http://qnimate.com/tabbed-area-using-html-and-css-only/  */
+.tabs
+{
+	position: relative;
+	clear: both;
+}
+
+.tabs .tab
+{
+	float: left;
+}
+
+.tabs .tab .content
+{
+	position: absolute;
+	background-color: white;
+	left: 0px;
+	width: 100%;
+	border: 1px #000 solid;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	align-items: flex-start;
+}
+
+.checkboxtab
+{
+	display: none;
+}
+
+.tab label
+{
+	margin-right: 10px;
+}
+
+.checkboxtab:checked ~ label
+{
+	color: #ab70ff;
+	border: 1px #000 solid;
+}
+
+.checkboxtab:checked ~ .content
+{
+	z-index: 1;
+}
 </style>
 </head>
 <body>
@@ -57,8 +103,10 @@ div.korlatozottmagassag1000
  <!--<a href="weblapajax">alapra</a>-->
 @Html(WeblapModell.ajaxAlapraForm(wParams))
 <div id=statusz></div>
+<button onclick="statuszgomb()">Státusz</button>
 @Html(WeblapModell.ajaxForm(wParams))
 <script type="text/javascript">
+
 var ajaxobj = new XMLHttpRequest();
 
 function inicgomb()
@@ -81,14 +129,14 @@ function inicajaxhivas(cim)
 		{
 			//if (ajaxobj.status == 200)
 			{
-				document.getElementById("ajaxinic").innerHTML = ajaxobj.responseText;
-				document.getElementById("statusz").innerHTML = "inic kész, státusz=" + ajaxobj.statusText;
+				inicdiv.innerHTML = ajaxobj.responseText;
+				statuszdiv.innerHTML = "inic kész, státusz=" + ajaxobj.statusText;
 			}
 			if (ajaxobj.status == 200) feldolggomb('');
 		}
 	};
 	ajaxobj.send();
-	document.getElementById("statusz").innerHTML = "inic folyamatban...";
+	statuszdiv.innerHTML = "inic folyamatban...";
 }
 
 function feldolggomb(pluszpar)
@@ -105,15 +153,27 @@ function feldolgajaxhivas(pill, pluszpar)
 		if (ajaxobj.readyState == 4)
 			//if (ajaxobj.status == 200)
 			{
-				document.getElementById("ajaxfeldolg").innerHTML = ajaxobj.responseText;
-				document.getElementById("statusz").innerHTML = "feldolg kész, státusz=" + ajaxobj.status;
+				feldolgdiv.innerHTML = ajaxobj.responseText;
+				statuszdiv.innerHTML = "feldolg kész, státusz=" + ajaxobj.status;
 				//ha a képnek ugyanaz a címe, de megváltozott: (de ezt lehet, hogy a hívóból kéne intézni)
 				//var kepElem = document.querySelector("#ajaxfeldolg img");  //attribútumra csak getter meg setter van, azért ilyen bonyolult
 				//if (kepElem) kepElem.setAttribute("src", kepElem.getAttribute("src") + "#" + document.getElementById('idoLong').innerHTML)
 			}
 	};
 	ajaxobj.send();
-	document.getElementById("statusz").innerHTML = "feldolg folyamatban...";
+	statuszdiv.innerHTML = "feldolg folyamatban...";
+}
+
+function statuszgomb()
+{
+  ajaxobj.open('GET', 'weblapajaxfeldolg?pill=0&muvelet=statusz');
+  ajaxobj.onreadystatechange = function()
+  {
+    if (ajaxobj.readyState == 4)
+    	statuszdiv.innerHTML = ajaxobj.responseText;
+  }
+  ajaxobj.send();
+  statuszdiv.innerHTML = "státusz... mindjárt";
 }
 </script>
 <div id=ajaxinic>ajaxinic kimenet helye</div>
@@ -121,6 +181,11 @@ function feldolgajaxhivas(pill, pluszpar)
 <button type="button" onclick="console.log('Feldolg. meg van nyomva'); feldolggomb('')">Feldolgozás</button>
 <button type="button" onclick="feldolggomb('&muvelet=csuk')">Csuk</button>
 <div id=ajaxfeldolg>ajaxfeldolg helye</div>
+<script>
+var statuszdiv = document.getElementById("statusz");
+var inicdiv = document.getElementById("ajaxinic");
+var feldolgdiv = document.getElementById("ajaxfeldolg");
+</script>
 
 <!-- @*   twirl-ül is ki kell kommentelni!! (vagy csak úgy)
 @Html(WeblapModell.feldolg)

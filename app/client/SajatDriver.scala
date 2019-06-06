@@ -48,7 +48,8 @@ object SajatDriver
 		meghajtok(tip)
 	}
 	// ...hanem:
-	def apply = meghajtoNyit(_)   //innentől SajatDriver(tip) -'el lehet példányosítani - elvileg
+	//def apply = meghajtoNyit(_)   //innentől SajatDriver(tip) -'el lehet példányosítani - elvileg
+	def apply(tip: DrTip): SajatDriver = meghajtoNyit(tip) //még innentől is csak elvileg, de így legalább .apply-'al lehet hívni
 
 	val aktMeghajtoTipus = FFDR  // <---- itt kell meghajtótípust változtatni!
 
