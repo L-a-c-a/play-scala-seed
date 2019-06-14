@@ -19,7 +19,10 @@ import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
-public class WeblapSe extends Weblap
+/*
+ * WeblapSe kezdeménye, még java-ban - amaz ennek a leszármazottja (most még?) 2019-06
+ */
+public class WeblapSeJ extends Weblap
 {
 
 	
@@ -58,7 +61,7 @@ public class WeblapSe extends Weblap
 		try { inicEredm = rOS.size() == 0 ? "rOS üres" : rOS.toString("UTF-8"); }catch (java.io.UnsupportedEncodingException e) {}
 	}
 
-	public WeblapSe(Map<String, String[]> wParams)	//ellenjavallt (dekrepált), tessék kívülről driver-t adni
+	public WeblapSeJ(Map<String, String[]> wParams)	//ellenjavallt (dekrepált), tessék kívülről driver-t adni
 	{
 		super(wParams);
 		
@@ -72,29 +75,20 @@ public class WeblapSe extends Weblap
 		Function<WebElement, String> elembolHtmlMap =
 				elem ->
 		{
-			return elem.getAttribute("href")
+			return "<div>"
+			    + elem.getAttribute("href")
 					+  " "
 					+  elem.getText()
 					+ "<button class=alacsonygomb onclick='inicajaxhivas(\"weblapajaxinic?url=" + elem.getAttribute("href") + "&s=" + s + "\")'>nyomjad</button>"
-					+ "<br>";
+					+ "</div>";
 		};
 		return driver.findElements(By.cssSelector("a[href]"))
 				.stream()
 				.map(elembolHtmlMap)
 				.reduce("", (a,b)->a+b);
-/*
-		driver.findElements(By.cssSelector("a[href]")).forEach
-		(
-			elem ->
-			{
-.........................
-			}
-		);
-		return ret[0];
-*/
 	}
 
-	public WeblapSe(Map<String, String[]> wParams, SajatDriver dr)
+	public WeblapSeJ(Map<String, String[]> wParams, SajatDriver dr)
 	{
 		super(wParams);
 		driver = dr;
@@ -107,9 +101,10 @@ public class WeblapSe extends Weblap
 	  feldolgPill = Instant.now();
 	  Long pill = feldolgPill.toEpochMilli();
 		/**/ System.out.println("WeblapSe.feldolg() meghívva " + pill + " " + feldolgPill);
+		//de nem ezt használjuk az ideigl. fájlok nevéhez, mert az a koncepció, hogy azok addig élnek, ameddig a példány
 		
-		String kepfajl = "screenshot" + pill + ".png";
-		String htmlfajl = "drpagesource" + pill + ".html";
+		String kepfajl = "screenshot" + inicPill + ".png";
+		String htmlfajl = "drpagesource" + inicPill + ".html";
 		
 		if (tmpKepFajl.isEmpty())
 		{

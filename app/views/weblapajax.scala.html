@@ -102,12 +102,42 @@ div.korlatozottmagassag1000
   -->
  <!--<a href="weblapajax">alapra</a>-->
 @Html(WeblapModell.ajaxAlapraForm(wParams))
+<div id=ajaxstatusz style="color: blue;"></div>
 <div id=statusz></div>
 <button onclick="statuszgomb()">Státusz</button>
 @Html(WeblapModell.ajaxForm(wParams))
 <script type="text/javascript">
 
 var ajaxobj = new XMLHttpRequest();
+
+/* ajax onreadystatechange-nek @*
+ * jó esetben a válasz elején egy id van, hova kell beszúrni
+ * ajaxobj-'t használja (lehetne paraméter)
+ * @param muvnev:String műveletnév, csak állapotkijelzéshez
+ * @param tovabbi:function ha kész, további lépés
+ * @param tovabbiPar az előbbi paramétere(i) *@
+ */
+function ajaxvalasz(muvnev, tovabbi, ...tovabbiPar)
+{
+	console.log(`${muvnev} folyamatban, readystate=${ajaxobj.readyState}, státusz=${ajaxobj.status} ${ajaxobj.statusText}`);
+	if (ajaxobj.readyState == 4)
+	{
+		var hova, mit;
+		var kette = ajaxobj.responseText.split('¤'); //az'ttem, hogy csak ketté lesz, a for csak utána jutott eszembe
+		if (kette.length==1)  //ha nem 200, biztos ez lesz a helyzet
+			kette.unshift(muvnev=="inic" ? 'ajaxinic' : 'statusz');
+		for(var i=0;i<kette.length;i+=2)
+		{
+			hova = kette[i];
+			mit = kette[i+1];
+			/* */ console.log(`hova=${hova}, mit=${mit}`);
+			document.getElementById(hova).innerHTML = mit;
+		}
+		ajaxstatuszdiv.innerHTML = muvnev + " kész, státusz=" + ajaxobj.statusText;
+		if (ajaxobj.status == 200) if (tovabbi) tovabbi.apply(this, tovabbiPar);
+	}
+}
+// innentől bárhány helyre bárhány kóddarabot oda tudok ajaxolni egy hívásból
 
 function inicgomb()
 {
@@ -119,24 +149,11 @@ function inicgomb()
 
 function inicajaxhivas(cim)
 {
-	/**/ console.log("inicajaxhivas cim="+cim)
+	/* */ console.log("inicajaxhivas cim="+cim)
 	ajaxobj.open('GET', cim);
-	ajaxobj.onreadystatechange = function()
-	{
-		console.log("inic folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.status + " " + ajaxobj.statusText);
-		//document.getElementById("statusz").innerHTML = "inic folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.statusText;
-		if (ajaxobj.readyState == 4)
-		{
-			//if (ajaxobj.status == 200)
-			{
-				inicdiv.innerHTML = ajaxobj.responseText;
-				statuszdiv.innerHTML = "inic kész, státusz=" + ajaxobj.statusText;
-			}
-			if (ajaxobj.status == 200) feldolggomb('');
-		}
-	};
+	ajaxobj.onreadystatechange = function(){ajaxvalasz('inic', feldolggomb, '');} //közvetlenül az ajaxvalasz-t csak () nélkül lehetne odaadni neki, vagyis par. nélkül
 	ajaxobj.send();
-	statuszdiv.innerHTML = "inic folyamatban...";
+	ajaxstatuszdiv.innerHTML = "inic folyamatban...";
 }
 
 function feldolggomb(pluszpar)
@@ -147,21 +164,23 @@ function feldolggomb(pluszpar)
 function feldolgajaxhivas(pill, pluszpar)
 {
 	ajaxobj.open('GET', 'weblapajaxfeldolg?pill=' + pill + pluszpar);
-	ajaxobj.onreadystatechange = function()
+	ajaxobj.onreadystatechange = function(){ajaxvalasz('feldolg', statuszgomb);}
+/*
 	{
 		console.log("feldolg folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.status + " " + ajaxobj.statusText);
 		if (ajaxobj.readyState == 4)
 			//if (ajaxobj.status == 200)
 			{
 				feldolgdiv.innerHTML = ajaxobj.responseText;
-				statuszdiv.innerHTML = "feldolg kész, státusz=" + ajaxobj.status;
+				ajaxstatuszdiv.innerHTML = "feldolg kész, státusz=" + ajaxobj.status;
 				//ha a képnek ugyanaz a címe, de megváltozott: (de ezt lehet, hogy a hívóból kéne intézni)
 				//var kepElem = document.querySelector("#ajaxfeldolg img");  //attribútumra csak getter meg setter van, azért ilyen bonyolult
 				//if (kepElem) kepElem.setAttribute("src", kepElem.getAttribute("src") + "#" + document.getElementById('idoLong').innerHTML)
 			}
 	};
+*/
 	ajaxobj.send();
-	statuszdiv.innerHTML = "feldolg folyamatban...";
+	ajaxstatuszdiv.innerHTML = "feldolg folyamatban...";
 }
 
 function statuszgomb()
@@ -182,6 +201,7 @@ function statuszgomb()
 <button type="button" onclick="feldolggomb('&muvelet=csuk')">Csuk</button>
 <div id=ajaxfeldolg>ajaxfeldolg helye</div>
 <script>
+var ajaxstatuszdiv = document.getElementById("ajaxstatusz");
 var statuszdiv = document.getElementById("statusz");
 var inicdiv = document.getElementById("ajaxinic");
 var feldolgdiv = document.getElementById("ajaxfeldolg");

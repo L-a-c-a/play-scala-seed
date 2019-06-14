@@ -12,6 +12,9 @@ public class Weblap
 	String s = "";
 	public String getS() { return s; }
 	
+	java.time.Instant inicPill;
+	public void setInicPill(java.time.Instant pill) { inicPill = pill; }
+	
 	public String getInicEredm() { return ""; }   //majd a leszármazottban csinál valamit
 	
 	public Weblap() 	//legyen egy ilyen is, hogy a modellnek ne kelljen nullal inicializálni

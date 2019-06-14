@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-public class WeblapSeCP extends WeblapSe
+public class WeblapSeCP extends WeblapSeJ
 {
 /*
  * a Cerrón-Palomino-könyvnek a scribd-en

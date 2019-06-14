@@ -43,37 +43,24 @@ object WeblapModell
 	def inic (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek a .scala.html lapról
 	{
 		var s = ""
-		//s = wParams.get("s")(0)  //kiváltódik? - ki.
 		//try { s = wParams.get("s")(0) } catch {case e:NullPointerException => }   vagy: (miért nem mindig így csináltam...)
 		if (wParams.containsKey("s")) s = wParams.get("s")(0)		//vagy miért nem így: var s = (Option(wParams.get("s")) getOrElse Array(""))(0)
-/*
-		if (s=="Se")
-		{
-			lap = new WeblapSe(wParams, meghajtoNyit(aktMeghajtoTipus))
-			//lap = new WeblapSe(wParams, SajatDriver(aktMeghajtoTipus))  nem műx; az explicit apply igen (amennyiben az = meghajtoNyit(_) )
-			return lap.getClass + " példányosítva" //+ "<br>" + lap.getInicEredm
-		}
-		if (s=="SeCP")
-		{
-			wParams.put("url", Array("https://www.scribd.com/document/397870947/Gramatica-Quechua-Junin-Huanca-Rodolfo-Cerron-Palomino"))
-			lap = new WeblapSeCP(wParams, meghajtoNyit(aktMeghajtoTipus))
-			return lap.getClass + " példányosítva"
-		}
-		lap = new Weblap(wParams)
-		return lap.getClass + " példányosítva"
-* átment Weblap.apply()-ba
-*/
+
 		lap = Weblap.apply(wParams, s)		// Weblap(wParams, s) nem műx: class client.Weblap is not a value
 		lap.getClass + " példányosítva"
 	}
 
 	def inicAjax (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek az ajaxos .scala.html lapról
 	{
-		var ret = inic(wParams)  //ettől lesz egy weblap a lap-ban
+		var ret = "ajaxinic¤" + inic(wParams)  //ettől lesz egy weblap a lap-ban
 		var pillInstant = java.time.Instant.now
 		var pill = pillInstant.toEpochMilli
+    lap.setInicPill(pillInstant)  //igazából a konstruktorban lenne a helye
+    //**/ println("inicEredm="+lap.getInicEredm)
 		tartosWeblapok.put(pill, lap)
-		ret + s"<div><span id=idoLong>$pill</span> <span id=idoISO>$pillInstant</span></div>"
+		ret += s"<div><span id=idoLong>$pill</span> <span id=idoISO>$pillInstant</span></div>"
+		ret += "<pre>" + lap.getInicEredm + "</pre>"
+		ret
 	}
 	
 	def feldolg /*(wParams: Map[String, Array[String]]): String*/ = lap.feldolg
@@ -101,7 +88,7 @@ object WeblapModell
 		//lap.close()
 		//lehet, hogy scalátlan, de világos
 		
-		ret + tartosWeblapokStatusz
+		ret //+ tartosWeblapokStatusz
 	}
 
 	def csuk(pill: Long) =
