@@ -52,10 +52,11 @@ object WeblapModell
 
 	def inicAjax (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek az ajaxos .scala.html lapról
 	{
-		var ret = "ajaxinic¤" + inic(wParams)  //ettől lesz egy weblap a lap-ban
 		var pillInstant = java.time.Instant.now
 		var pill = pillInstant.toEpochMilli
-    lap.setInicPill(pillInstant)  //igazából a konstruktorban lenne a helye
+		wParams.put("pill", Array(pill.toString))
+		var ret = "ajaxinic¤" + inic(wParams)  //ettől lesz egy weblap a lap-ban
+    //lap.setInicPill(pillInstant)  //igazából a konstruktorban lenne a helye
     //**/ println("inicEredm="+lap.getInicEredm)
 		tartosWeblapok.put(pill, lap)
 		ret += s"<div><span id=idoLong>$pill</span> <span id=idoISO>$pillInstant</span></div>"
@@ -72,6 +73,7 @@ object WeblapModell
 		{
 			case "csuk" => csuk(pill)
 			case "statusz" => tartosWeblapokStatusz
+			case "katt" => "lapcim¤" + pill + " meg van kattintva"
 			case _ => feldolg(pill)
 		}
 	}

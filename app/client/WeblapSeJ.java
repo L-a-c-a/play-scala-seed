@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.imageio.ImageIO;
@@ -43,7 +44,7 @@ public class WeblapSeJ extends Weblap
 	@Override
 	public String getInicEredm() { return inicEredm; }
 	
-	Instant feldolgPill;
+	Instant feldolgPill = Instant.ofEpochMilli(0L);
 
 	public void seInic() //output az inicEredm-ben; konstruktor hívja, azért void
 	{
@@ -64,7 +65,7 @@ public class WeblapSeJ extends Weblap
 	public WeblapSeJ(Map<String, String[]> wParams)	//ellenjavallt (dekrepált), tessék kívülről driver-t adni
 	{
 		super(wParams);
-		
+
 		//driverInic(); helyett new SajatFirefoxDriver(); a driver inicializálásában
 		seInic();
 	}
@@ -74,15 +75,20 @@ public class WeblapSeJ extends Weblap
 		//String[] ret = {""};
 		Function<WebElement, String> elembolHtmlMap =
 				elem ->
-		{
+		{ String absHref = Optional.ofNullable(elem.getAttribute("href")).orElse("[nincs href]"); // getAttribute beleokoskodik és abszolút címet ad!
+		  String relHref = Optional.ofNullable((String) driver.executeScript("return arguments[0].getAttribute('href');", elem)).orElse("[nincs href]");
+      //**/ System.out.println ("|"+absHref+"|"); //getAttribute még /-t is tesz a szerver végére
+      //**/ System.out.println ("|"+relHref+"|");
 			return "<div>"
-			    + elem.getAttribute("href")
-					+  " "
-					+  elem.getText()
+			    + relHref 
+			    + (relHref.replace("/", "").equals(absHref.replace("/", "")) ? " " : " (" + absHref +  ") ")  //replaceAll-t akartam, de így is jó
+			    + Optional.ofNullable(elem.getAttribute("onclick")).orElse("")
+					+ elem.getText()
 					+ "<button class=alacsonygomb onclick='inicajaxhivas(\"weblapajaxinic?url=" + elem.getAttribute("href") + "&s=" + s + "\")'>nyomjad</button>"
+					+ "<button class=alacsonygomb onclick='feldolgajaxhivas(\"" + inicPill.toEpochMilli() + "\", \"&muvelet=katt\")'>katt</button>"
 					+ "</div>";
 		};
-		return driver.findElements(By.cssSelector("a[href]"))
+		return driver.findElements(By.cssSelector("a[href], [onclick]"))  //esetleg :is(..., ...)
 				.stream()
 				.map(elembolHtmlMap)
 				.reduce("", (a,b)->a+b);
@@ -92,6 +98,8 @@ public class WeblapSeJ extends Weblap
 	{
 		super(wParams);
 		driver = dr;
+		/* */ System.out.println("wParams="+wParams);
+		if (wParams.containsKey("pill")) inicPill = Instant.ofEpochMilli(Long.parseLong(wParams.get("pill")[0]));
 		seInic();
 	}
 	

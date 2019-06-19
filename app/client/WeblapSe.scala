@@ -13,17 +13,26 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 {
   //super(wParams, dr) nem kell, az extends-be kell írni
 
-  override def seInic =
+  var kattintanivalok = kattintaniValok
+    //**/ println(s"konstruáláskor kattintanivalok=$kattintanivalok...?")
+  // seInic-be való lenne a def., de ott korai - itt rend akkor lesz, ha az egész átjön scalába
+  
+  def kattintaniValok() =
+    "kattintanivalók"
+
+    override def seInic =
   {
     //super.seInic
     //println("WeblapSe.scala seInic meghívva")  //oké, ezt hívja meg a "konstruktor"
     
     //előlről
     /**/ println("driver.get hívás előtt url="+url)
-    /**/ println("feldolgHtml="+WeblapSe.feldolgHtml)  //null, ha az osztályban van (és nem "static")
+    //**/ println("feldolgHtml="+WeblapSe.feldolgHtml)  //null, ha az osztályban van (és nem "static")
     driver.get(url);
     docHtml = driver.getPageSource();
     linkek = linkek(); // ezt inickor kell
+    //kattintanivalok = kattintaniValok()   itt korai, mert előbb hajtódik végre, mint a kattintanivalok definiálása
+    //**/ println(s"kattintanivalok=$kattintanivalok...mé?")
     
     inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {driver.getTitle}</pre>
 
@@ -55,7 +64,9 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     }else
       htmlfajl = tmpHtmlFajl + "#" + pill
 
+    //**/ println(s"feldolgkor kattintanivalok=$kattintanivalok...mé?")
     var ret = "linkek¤" + linkek
+    ret += "¤kattintanivalok¤" + kattintanivalok
     ret += "¤kep¤" + s"""<img src=assets/tmp/$kepfajl></img>"""
     ret += "¤forras¤" + s"""<iframe src=assets/tmp/$htmlfajl style="flex-grow: 1; width: 100%;"></iframe>"""  //hát még ha attribútum írására is fel lenne készülve a js oldal
     ret
@@ -69,22 +80,29 @@ object WeblapSe
   <pre id="lapcim"></pre>
     <div class="tabs">
     <div class="tab">
-      <input name="checkbox-tabs-group" type="radio" id="checkbox1" class="checkboxtab" checked=""></input>
-      <label for="checkbox1">Linkek</label>
+      <input name="checkbox-tabs-group" type="radio" id="checkbox10" class="checkboxtab" checked=""></input>
+      <label for="checkbox10">Linkek</label>
       <div id="linkek" class="content" style="overflow-y: auto;">
       </div>
     </div>
     
     <div class="tab">
-      <input name="checkbox-tabs-group" type="radio" id="checkbox2" class="checkboxtab"></input>
-      <label for="checkbox2">Kép</label>
+      <input name="checkbox-tabs-group" type="radio" id="checkbox15" class="checkboxtab"></input>
+      <label for="checkbox15">Kattintanivalók</label>
+      <div id="kattintanivalok" class="content">
+      </div>
+    </div>
+    
+    <div class="tab">
+      <input name="checkbox-tabs-group" type="radio" id="checkbox20" class="checkboxtab"></input>
+      <label for="checkbox20">Kép</label>
       <div id="kep" class="content">
       </div>
     </div>
     
     <div class="tab">
-      <input name="checkbox-tabs-group" type="radio" id="checkbox3" class="checkboxtab"></input>
-      <label for="checkbox3">Forrás</label>
+      <input name="checkbox-tabs-group" type="radio" id="checkbox30" class="checkboxtab"></input>
+      <label for="checkbox30">Forrás</label>
       <div id="forras" class="content">
       </div>
     </div>

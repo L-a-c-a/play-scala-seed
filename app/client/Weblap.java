@@ -12,7 +12,7 @@ public class Weblap
 	String s = "";
 	public String getS() { return s; }
 	
-	java.time.Instant inicPill;
+	java.time.Instant inicPill = java.time.Instant.ofEpochMilli(0L);
 	public void setInicPill(java.time.Instant pill) { inicPill = pill; }
 	
 	public String getInicEredm() { return ""; }   //majd a leszármazottban csinál valamit
