@@ -32,12 +32,13 @@ object WeblapModell
 		tartosWeblapok
 		//.map(tartosWeblapbolHtml)  na, ehelyett van a case		https://twitter.github.io/scala_school/collections.html#vsMap
 		.map{ case (pill, lap) =>		//még csak zárójelbe se kell tenni a {...}-t
-					s"""$pill ${java.time.Instant.ofEpochMilli(pill)} ${lap.getS} ${lap.getURL}
+					//s"""$pill ${java.time.Instant.ofEpochMilli(pill)} ${lap.statusz}
+					s"""$pill: ${lap.statusz}
 							|<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
 							|<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
 							|""".stripMargin
 				}
-		.foldLeft("<br>")(_ + "<br>" + _)
+		.foldLeft("<div>")(_ + "</div>\n<div>" + _) + "</div>"
 	}
 
 	def inic (wParams: Map[String, Array[String]]): String =	//ezt kell hívni elsőnek a .scala.html lapról
@@ -67,13 +68,13 @@ object WeblapModell
 	def feldolg /*(wParams: Map[String, Array[String]]): String*/ = lap.feldolg
 	// de valsz. nem kell neki a paraméter, mert már az inic-kor eltette magának
 	
-	def feldolg(pill: Long, muvelet: String): String =
+	def feldolg(pill: Long, muvelet: String, par: String): String =
 	{
 		muvelet match
 		{
 			case "csuk" => csuk(pill)
 			case "statusz" => tartosWeblapokStatusz
-			case "katt" => "lapcim¤" + pill + " meg van kattintva"
+			case "katt" => "lapcim¤" + tartosWeblapok(pill).katt(par)  //pill + " meg van kattintva"
 			case _ => feldolg(pill)
 		}
 	}

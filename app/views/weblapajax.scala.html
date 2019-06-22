@@ -21,12 +21,17 @@ nem működnek */
 .feldobosbavalo
 {
 	display: none;
-	height: 200px;
+	/*height: 200px;*/
 	overflow-y: auto;
 }
 .feldobos:hover .feldobosbavalo
 {
 	display: block;
+	position: absolute;
+	/*opacity: 1; ettől ugyanaz; 0-tól meg egyáltalán nem látszik*/
+	background-color: White; /*ez kell, hogy letakarja az alatta levőt - de a feldobos-ban a gomb ezt takarja le!*/
+	z-index: 1; /*ez megoldja a gomb takarását*/
+	width: 1000px;
 }
 
 div.korlatozottmagassag1000
@@ -163,6 +168,7 @@ function feldolggomb(pluszpar)
 
 function feldolgajaxhivas(pill, pluszpar)
 {
+	console.log(`feldolgajaxhivas($pill, $pluszpar) ` + 'weblapajaxfeldolg?pill=' + pill + pluszpar);
 	ajaxobj.open('GET', 'weblapajaxfeldolg?pill=' + pill + pluszpar);
 	ajaxobj.onreadystatechange = function(){ajaxvalasz('feldolg', statuszgomb);}
 /*

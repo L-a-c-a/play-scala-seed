@@ -20,5 +20,5 @@ GET		/map	controllers.HomeController.map
 GET		/weblap	controllers.HomeController.weblap
 GET		/weblapajax			controllers.HomeController.weblapAjax
 GET		/weblapajaxinic			controllers.HomeController.weblapAjaxInic
-GET		/weblapajaxfeldolg	controllers.HomeController.weblapAjaxFeldolg(pill, muvelet ?= "")
+GET		/weblapajaxfeldolg	controllers.HomeController.weblapAjaxFeldolg(pill, muvelet ?= "", par ?= "")
 

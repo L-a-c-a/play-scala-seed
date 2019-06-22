@@ -19,6 +19,10 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   
   def kattintaniValok() =
     "kattintanivalók"
+  
+  var drURL = driver.getCurrentUrl  //a Weblap-ban már van egy url, a wParams-ban kapott
+  var lapcim = driver.getTitle
+  var ablak = driver.getWindowHandle
 
     override def seInic =
   {
@@ -71,6 +75,36 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     ret += "¤forras¤" + s"""<iframe src=assets/tmp/$htmlfajl style="flex-grow: 1; width: 100%;"></iframe>"""  //hát még ha attribútum írására is fel lenne készülve a js oldal
     ret
   }
+  
+  override // Weblap-é az ős
+  def statusz = s"$s $feldobosStatusz $lapcim"
+  
+  def feldobosStatusz =
+    <div class="feldobos">
+      <button class="alacsonygomb">+</button>
+      <div class="feldobosbavalo">
+        {reszletesStatusz}
+      </div>
+    </div>
+
+  def reszletesStatusz = 
+    <div>inicPill={inicPill}</div>
+    <div>lapcím={lapcim}</div>
+    <div>url={url}</div>
+    <div>drURL={drURL}</div>
+    <div>ablak={ablak}</div>
+
+  override //üres ős a Weblap-ban
+  def katt =
+    inicPill + " meg van kattintva"
+
+  override //üres ős a Weblap-ban
+  def katt (xpath: String) =
+  {
+    driver.findElement(org.openqa.selenium.By.xpath(xpath)).click
+    inicPill + " meg van kattintva, xpath=" + xpath
+  }
+
 }
 
 object WeblapSe

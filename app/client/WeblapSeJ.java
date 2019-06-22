@@ -79,13 +79,26 @@ public class WeblapSeJ extends Weblap
 		  String relHref = Optional.ofNullable((String) driver.executeScript("return arguments[0].getAttribute('href');", elem)).orElse("[nincs href]");
       //**/ System.out.println ("|"+absHref+"|"); //getAttribute még /-t is tesz a szerver végére
       //**/ System.out.println ("|"+relHref+"|");
+      String fahOnclick = "";
+      try
+      { fahOnclick= "feldolgajaxhivas('" + inicPill.toEpochMilli() + "', '&muvelet=katt&par=" + java.net.URLEncoder.encode(generateXPATH(elem, ""), "UTF-8") + "');";
+      }catch (java.io.UnsupportedEncodingException e) { /*anyád*/ }
+      String fahOnclickEmberi = "feldolgajaxhivas('" + inicPill.toEpochMilli() + "', '&muvelet=katt&par=" + generateXPATH(elem, "") + "');";
+      //**/ System.out.println ("fahOnclick=" + fahOnclick);
 			return "<div>"
 			    + relHref 
 			    + (relHref.replace("/", "").equals(absHref.replace("/", "")) ? " " : " (" + absHref +  ") ")  //replaceAll-t akartam, de így is jó
 			    + Optional.ofNullable(elem.getAttribute("onclick")).orElse("")
 					+ elem.getText()
-					+ "<button class=alacsonygomb onclick='inicajaxhivas(\"weblapajaxinic?url=" + elem.getAttribute("href") + "&s=" + s + "\")'>nyomjad</button>"
-					+ "<button class=alacsonygomb onclick='feldolgajaxhivas(\"" + inicPill.toEpochMilli() + "\", \"&muvelet=katt\")'>katt</button>"
+          //+ "|" + elem.getAttribute("xpath") + "|" -> |null|
+          //+ "|" + generateXPATH(elem, "") + "|"
+          //+ "|" + fahOnclick + "|"
+					+ ( "[nincs href]".equals(relHref)
+					  ? "<button class=alacsonygomb disabled>ne nyomjad</button>"
+            : "<button class=alacsonygomb onclick='inicajaxhivas(\"weblapajaxinic?url=" + elem.getAttribute("href") + "&s=" + s + "\");'>nyomjad</button>"
+            )
+          + "<button class=alacsonygomb onclick=\"" + fahOnclick + "\" title=\"" + fahOnclickEmberi + "\">katt</button>"
+          //+ "<button class=alacsonygomb onclick='this.click();'>katt(JS)</button>" ez így egy baromság; azonosítani kéne a célelemet (hogy a tökbe?), és azt kattintani
 					+ "</div>";
 		};
 		return driver.findElements(By.cssSelector("a[href], [onclick]"))  //esetleg :is(..., ...)
@@ -180,5 +193,37 @@ public class WeblapSeJ extends Weblap
     tmpKepFajl = "";
     tmpHtmlFajl = "";
 	}
+
+  //innen: https://stackoverflow.com/questions/50578809/how-can-i-get-the-xpath-from-a-webelement
+  public static String generateXPATH(WebElement childElement, String current) {
+        String childTag = childElement.getTagName();
+        //én:
+        String childId = childElement.getAttribute("id");
+        if (childId != null)
+          if (childId.length() > 0)
+            return "//*[@id='" + childId + "']" + current;  //de ez így nagyon nem jó urlencode nélkül
+        if(childTag.equals("body")) //abból is csak egy van
+        {
+          return "body" + current;
+        }
+        //idáig én
+        if(childTag.equals("html")) {
+            return "/html[1]"+current;
+        }
+        WebElement parentElement = childElement.findElement(By.xpath("..")); 
+        java.util.List<WebElement> childrenElements = parentElement.findElements(By.xpath("*"));
+        int count = 0;
+        for(int i=0;i<childrenElements.size(); i++) {
+            WebElement childrenElement = childrenElements.get(i);
+            String childrenElementTag = childrenElement.getTagName();
+            if(childTag.equals(childrenElementTag)) {
+                count++;
+            }
+            if(childElement.equals(childrenElement)) {
+                return generateXPATH(parentElement, "/" + childTag + "[" + count + "]"+current);
+            }
+        }
+        return null;
+    }
 
 }
