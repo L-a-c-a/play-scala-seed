@@ -79,11 +79,12 @@ public class WeblapSeJ extends Weblap
 		  String relHref = Optional.ofNullable((String) driver.executeScript("return arguments[0].getAttribute('href');", elem)).orElse("[nincs href]");
       //**/ System.out.println ("|"+absHref+"|"); //getAttribute még /-t is tesz a szerver végére
       //**/ System.out.println ("|"+relHref+"|");
+      String fahOnclickVaz = "feldolgajaxhivas('" + inicPill.toEpochMilli() + "', '&muvelet=katt&par=%s');";  //%s-'el sprintf-hez... helyett String.format-hoz
       String fahOnclick = "";
       try
-      { fahOnclick= "feldolgajaxhivas('" + inicPill.toEpochMilli() + "', '&muvelet=katt&par=" + java.net.URLEncoder.encode(generateXPATH(elem, ""), "UTF-8") + "');";
+      { fahOnclick= String.format(fahOnclickVaz, java.net.URLEncoder.encode(generateXPATH(elem, ""), "UTF-8"));
       }catch (java.io.UnsupportedEncodingException e) { /*anyád*/ }
-      String fahOnclickEmberi = "feldolgajaxhivas('" + inicPill.toEpochMilli() + "', '&muvelet=katt&par=" + generateXPATH(elem, "") + "');";
+      String fahOnclickEmberi = String.format(fahOnclickVaz, generateXPATH(elem, ""));
       //**/ System.out.println ("fahOnclick=" + fahOnclick);
 			return "<div>"
 			    + relHref 
@@ -203,9 +204,7 @@ public class WeblapSeJ extends Weblap
           if (childId.length() > 0)
             return "//*[@id='" + childId + "']" + current;  //de ez így nagyon nem jó urlencode nélkül
         if(childTag.equals("body")) //abból is csak egy van
-        {
           return "body" + current;
-        }
         //idáig én
         if(childTag.equals("html")) {
             return "/html[1]"+current;
