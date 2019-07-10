@@ -29,16 +29,26 @@ object WeblapModell
           |""".stripMargin
     }
 */
-    tartosWeblapok
-    //.map(tartosWeblapbolHtml)  na, ehelyett van a case    https://twitter.github.io/scala_school/collections.html#vsMap
-    .map{ case (pill, lap) =>    //még csak zárójelbe se kell tenni a {...}-t
-          //s"""$pill ${java.time.Instant.ofEpochMilli(pill)} ${lap.statusz}
-          s"""$pill: ${lap.statusz}
-              |<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
-              |<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
-              |""".stripMargin
+    (    //az egész zárójelben a ;-okoskodás ellen (a + miatt)  (...de úgy meg "scrutinee is incompatible" hiba :( ...mindegy, a concat paraméterblokkja miatt is)
+      tartosWeblapok
+      //.map(tartosWeblapbolHtml)  na, ehelyett van a case    https://twitter.github.io/scala_school/collections.html#vsMap
+      .map{ case (pill, lap) =>    //még csak zárójelbe se kell tenni a {...}-t
+            //s"""$pill ${java.time.Instant.ofEpochMilli(pill)} ${lap.statusz}
+            s"""$pill: ${lap.statusz}
+                |<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
+                |<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
+                |""".stripMargin
+          }
+      .foldLeft("<div>")(_ + "</div>\n<div>" + _) + "</div>" 
+      //.concat (lap.asInstanceOf[WeblapSe].getDriver.statusz.toString)  //TERv: gatyábaráznivaló  --na, erre való a típus szerinti case
+      .concat
+      ( lap match    // a .concat()-ot lehet új sorba írni; a +-t nem (kivéve, ha zárójelben van az egész)
+        {
+          case lapu:WeblapSe => lapu.getDriver.statusz.toString
+          case _ => ""
         }
-    .foldLeft("<div>")(_ + "</div>\n<div>" + _) + "</div>"
+      )
+    )
   }
 
   def inic (wParams: Map[String, Array[String]]): String =  //ezt kell hívni elsőnek a .scala.html lapról
@@ -49,6 +59,7 @@ object WeblapModell
 
     lap = Weblap.apply(wParams, s)    // Weblap(wParams, s) nem műx: class client.Weblap is not a value
     lap.getClass + " példányosítva"
+    //.concat (lap.asInstanceOf[WeblapSe].getDriver.statusz.toString)  //TERv: gatyábaráznivaló 
   }
 
   def inicAjax (wParams: Map[String, Array[String]]): String =  //ezt kell hívni elsőnek az ajaxos .scala.html lapról

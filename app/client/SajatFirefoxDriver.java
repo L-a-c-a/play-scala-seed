@@ -2,8 +2,8 @@ package client;
 
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.GeckoDriverService;
-import org.openqa.selenium.firefox.XpiDriverService;
+//import org.openqa.selenium.firefox.GeckoDriverService;
+//import org.openqa.selenium.firefox.XpiDriverService;
 
 public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver  //csak az eclipse jelez hibát, a play-nek jó
 {
@@ -22,6 +22,28 @@ public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver  //
 	{
 		//az eredeti üres volt, ami implicit super() hívást jelent - vagyis van neki (mármint FirefoxDriver-nek () konstruktora)
 		super(driverInic());  //így megeszi
+		//inic(this);  //a SajatDriver-ből
+		//ablakok = (Set<String>) scala.collection.generic.GenericSetTemplate.empty();
 	}
+
+  public scala.collection.mutable.Map<String, WeblapSe> ablakok = SajatDriver$.MODULE$.uresAblakok();//= (Set<String>) scala.collection.mutable.Set.empty();  //??ezt itt nem lehet, mert static content
+  @Override
+  public void ablakok_$eq(scala.collection.mutable.Map<String, WeblapSe> s) { ablakok = s;}
+  @Override
+  public scala.collection.mutable.Map<String, WeblapSe> ablakok() { return ablakok;}
+/*
+	@Override
+	public String statusz()
+	{
+		return "";
+	}
+
+	@Override
+	public scala.collection.mutable.Set ablakok ;//= scala.collection.generic.GenericSetTemplate.empty();  ezt itt nem lehet, mert static content
+	@Override
+  public void ablakok_$eq(scala.collection.mutable.Set s) { ffAblakok = s;}
+	@Override
+	public scala.collection.mutable.Set ablakok() { return ffAblakok;}
+*/
 
 }

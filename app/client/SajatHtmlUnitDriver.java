@@ -32,4 +32,9 @@ public class SajatHtmlUnitDriver extends ScreenCaptureHtmlUnitDriver implements 
 		// TODO Auto-generated constructor stub
 	}
 
+  public scala.collection.mutable.Map<String, WeblapSe> ablakok = SajatDriver$.MODULE$.uresAblakok();
+  @Override
+  public void ablakok_$eq(scala.collection.mutable.Map<String, WeblapSe> s) { ablakok = s;}
+  @Override
+  public scala.collection.mutable.Map<String, WeblapSe> ablakok() { return ablakok;}
 }

@@ -34,6 +34,7 @@ public class WeblapSeJ extends Weblap
 	String inicEredm = ""; // mert esetleg a konstruktor is feldolgoz, és majd a feldolg jeleníti meg (lehet, hogy feljebb kell)
 	
 	SajatDriver driver; // = new SajatDriverC(); nem kell Weblap* példányonként egy böngésző
+	/* */ public SajatDriver getDriver() { return driver; }
 	
 	//2 ideiglenes fájl
   String tmpKepFajl = "";
@@ -112,7 +113,14 @@ public class WeblapSeJ extends Weblap
 	{
 		super(wParams);
 		driver = dr;
-		/* */ System.out.println("wParams="+wParams);
+		/* */ System.out.println("wParams={host="+((wParams.containsKey("host")) ? wParams.get("host")[0] : "")
+                                      +",s="+((wParams.containsKey("s")) ? wParams.get("s")[0] : "")
+                                      +",uri="+((wParams.containsKey("uri")) ? wParams.get("uri")[0] : "")
+                                      +",pill="+((wParams.containsKey("pill")) ? wParams.get("pill")[0] : "")
+                                      +",url="+((wParams.containsKey("url")) ? wParams.get("url")[0] : "")
+                                      +"}"
+                            );
+		//*/
 		if (wParams.containsKey("pill")) inicPill = Instant.ofEpochMilli(Long.parseLong(wParams.get("pill")[0]));
 		seInic();
 	}

@@ -5,9 +5,71 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.Proxy
 
+import collection.JavaConverters._
+
 trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
 {
 	//def sajatProxy = SajatDriver.sajatProxyVal //ezt static kontextusból nem lehet hívni - marad a társobjektumban
+  //var ablakok: collection.mutable.Set[String] //= collection.mutable.Set()  //getWindowHandle(s) adta azonosítóknak
+  var ablakok: collection.mutable.Map[String, WeblapSe]
+  //ettől csak egy ablakok() meg egy ablakok_$eq(Set) lesz felülírnivaló, ablakok változó nem
+  def statusz: scala.xml.Elem    //ezeket a Sajat*Driver osztályokban kell implementálni... vagy itt lehet egy default implementáció
+  =
+    <div>
+    <h6>Aktuális ablak</h6>
+    <span>{getWindowHandle + ": " + getCurrentUrl}</span>
+    <h6>Többi ablak (getWindowHandles)</h6>
+    {
+      getWindowHandles.asScala.map(abl => <div>{abl}</div>)//.foldLeft("")(_+_)
+    }
+    <h6>Többi ablak (ablakok)</h6>
+    {
+      ablakok.map { case (abl, lap) => <div>{abl}: {lap.driver.getCurrentUrl}</div> }
+    }
+    <h6>Többi meghajtó (statikus)</h6>
+    { SajatDriver.statikusStatusz }
+    </div>
+    //há'szen elérhető itt a példány (annak a getWindowHandle-je, getCurrentUrl-ja)! mi a probléma?
+
+/*
+  def inic: Unit =
+		{
+			println ("*********** SajatDriver inicializálva")
+		}
+*/
+
+/*
+ * keres egy használatlan (ablakok-ban meg nem levő) ablak-azonosítót (az elején biztos van olyan)
+ * - ha nem talál, csinál -,
+ * beleteszi ablakok-ba,
+ * és átkapcsol arra az ablakra (további get-ek stb. arra vonatkoznak)
+ * ..................nem jó, ketté kell választani, (ha nem háromfelé) 1. ablakok-ba be (de ez könnyebb a lap konstruálásakor), 2. új üres ablak (3. lap duplikálás új ablakba)
+ */
+  def ujAblakba =
+  {
+    var htlanAbl = hasznalatlanAblak
+    /**/ println("AAAAA htlanAbl=" + htlanAbl)
+    if (htlanAbl.isEmpty) //most jön Jégtörő Mátyás
+    {
+      executeScript("window.open('', '');")  //nyit egy új ablakot (vagy fület?) about:blank-kal
+      htlanAbl = hasznalatlanAblak   //a most nyitott ablak
+      /**/ println("AAAAB htlanAbl=" + htlanAbl)
+    }
+    ablakok += (htlanAbl -> new WeblapSe( Map( "url" -> Array("about:blank")
+                                             , "s" -> Array("Se")
+                                             ).asJava
+                                        , this
+                                        )
+               )
+    switchTo.window(htlanAbl)
+  }
+
+  def hasznalatlanAblak = (getWindowHandles.asScala diff ablakok.keySet).headOption getOrElse ""
+    //a két halmaz különbségének az "első" eleme (hogy melyik a max. 1 közül...)
+  
+  //def ablakokKoze (lap: WeblapSe) = // ha még getWindowHandle nincs az ablakok között, felvenni oda lap-ot ............kell??
+
+
 }
 
 object SajatDriver
@@ -52,5 +114,13 @@ object SajatDriver
 	def apply(tip: DrTip): SajatDriver = meghajtoNyit(tip) //még innentől is csak elvileg, de így legalább .apply-'al lehet hívni
 
 	val aktMeghajtoTipus = FFDR  // <---- itt kell meghajtótípust változtatni!
+/*
+  def inic(peldany: SajatDriver): Unit =
+    {
+      
+    }
+*/
+  val uresAblakok: collection.mutable.Map[String, WeblapSe] = collection.mutable.Map()
 
+  def statikusStatusz = <div>{meghajtok.map{case(tip, dr) => <div>{tip}: {dr.getWindowHandle}</div>}}</div>
 }
