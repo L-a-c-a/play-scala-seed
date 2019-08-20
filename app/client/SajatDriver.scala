@@ -52,6 +52,7 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     if (htlanAbl.isEmpty) //most jön Jégtörő Mátyás
     {
       executeScript("window.open('', '');")  //nyit egy új ablakot (vagy fület?) about:blank-kal
+      //executeScript("window.open(window.location, '');")  //...vagy megduplikálja a mostanit
       htlanAbl = hasznalatlanAblak   //a most nyitott ablak
       /**/ println("AAAAB htlanAbl=" + htlanAbl)
     }

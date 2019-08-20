@@ -45,6 +45,20 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 
   }
 
+/*
+ * Másodlagos konstruktor duplikáláshoz
+ */
+   
+  def this (w1: WeblapSe)
+  {
+    this(WeblapSe.wParamUjra(w1.url, w1.s), w1.driver)
+  }
+
+  def klon = // duplikátum új böngészőablakba, új WeblapModell.tartosWeblapok elembe
+  {
+    
+  }
+
   override def feldolg =
   {
     feldolgPill = Instant.now
@@ -108,7 +122,8 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   override //üres ős a Weblap-ban
   def katt (xpath: String) =
   {
-    driver.findElement(org.openqa.selenium.By.xpath(xpath)).click
+    //new WeblapSe(this)
+    //driver.findElement(org.openqa.selenium.By.xpath(xpath)).click
     inicPill + " meg van kattintva, xpath=" + xpath
   }
 
@@ -150,4 +165,12 @@ object WeblapSe
   </div>
 </div>
 
+  def wParamUjra (pUrl: String, pS: String, pPill: Instant = Instant.now): java.util.Map[String, Array[String]] =
+  {
+    var wp: java.util.Map[String, Array[String]] = new java.util.HashMap()
+    wp.put("url", Array(pUrl))
+    wp.put("s", Array(pS))
+    wp.put("pill", Array(pPill.toEpochMilli.toString))
+    wp
+  }
 }

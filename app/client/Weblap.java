@@ -17,6 +17,12 @@ public class Weblap
 
   public String getInicEredm() { return ""; }   //majd a leszármazottban csinál valamit
 
+  public Weblap(String pUrl, String pS)
+  {
+    url = pUrl;
+    s = pS;
+  }
+
   public Weblap()   //legyen egy ilyen is, hogy a modellnek ne kelljen nullal inicializálni
   {
     url = "";

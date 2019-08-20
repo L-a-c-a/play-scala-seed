@@ -211,8 +211,8 @@ public class WeblapSeJ extends Weblap
         if (childId != null)
           if (childId.length() > 0)
             return "//*[@id='" + childId + "']" + current;  //de ez így nagyon nem jó urlencode nélkül
-        if(childTag.equals("body")) //abból is csak egy van
-          return "body" + current;
+        //if(childTag.equals("body")) //abból is csak egy van
+          //return "body" + current;    okoskodás, nem műx
         //idáig én
         if(childTag.equals("html")) {
             return "/html[1]"+current;

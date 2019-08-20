@@ -1,4 +1,5 @@
 package client
+// amit java-ban nehézkes lenne definiálni
 
 object Szovegek 
 {
