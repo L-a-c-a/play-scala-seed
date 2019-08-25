@@ -45,24 +45,33 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
  * és átkapcsol arra az ablakra (további get-ek stb. arra vonatkoznak)
  * ..................nem jó, ketté kell választani, (ha nem háromfelé) 1. ablakok-ba be (de ez könnyebb a lap konstruálásakor), 2. új üres ablak (3. lap duplikálás új ablakba)
  */
-  def ujAblakba =
+  def ujAblakba (oLap: Option[WeblapSe] = None) =
   {
     var htlanAbl = hasznalatlanAblak
     /**/ println("AAAAA htlanAbl=" + htlanAbl)
     if (htlanAbl.isEmpty) //most jön Jégtörő Mátyás
     {
-      executeScript("window.open('', '');")  //nyit egy új ablakot (vagy fület?) about:blank-kal
+      //executeScript("window.open('', '');")  //nyit egy új ablakot (vagy fület?) about:blank-kal
       //executeScript("window.open(window.location, '');")  //...vagy megduplikálja a mostanit
+      var jsWinPar = if (oLap.isEmpty) "''" else "window.location"  //nem mintha nem lenne mindegy
+      executeScript(s"window.open($jsWinPar, '');")
       htlanAbl = hasznalatlanAblak   //a most nyitott ablak
       /**/ println("AAAAB htlanAbl=" + htlanAbl)
     }
-    ablakok += (htlanAbl -> new WeblapSe( Map( "url" -> Array("about:blank")
-                                             , "s" -> Array("Se")
-                                             ).asJava
-                                        , this
-                                        )
+    /* áááállj... ezt a konstruktor is megcsinálja!
+    ablakok += (htlanAbl -> { if(oLap.isEmpty) 
+                                new WeblapSe( Map( "url" -> Array("about:blank")
+                                                 , "s" -> Array("Se")
+                                                 ).asJava
+                                            , this
+                                            )
+                              else
+                                new WeblapSe(oLap.get)
+                            }
                )
+    */
     switchTo.window(htlanAbl)
+    //ezután kell konstruálni
   }
 
   def hasznalatlanAblak = (getWindowHandles.asScala diff ablakok.keySet).headOption getOrElse ""

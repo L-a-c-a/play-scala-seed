@@ -37,6 +37,7 @@ object WeblapModell
             s"""$pill: ${lap.statusz}
                 |<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
                 |<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
+                |<button onclick="inicajaxhivas('weblapajaxinic?kopp=$pill&s='+document.forms.inicform.elements.s.value)">Kopp</button>
                 |""".stripMargin
           }
       .foldLeft("<div>")(_ + "</div>\n<div>" + _) + "</div>" 

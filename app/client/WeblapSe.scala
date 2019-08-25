@@ -9,9 +9,33 @@ import java.io.File
 import javax.imageio.ImageIO
 import java.io.PrintWriter
 
+import models.WeblapModell
+
 class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) extends WeblapSeJ(wParams, dr)
 {
   //super(wParams, dr) nem kell, az extends-be kell írni
+  
+  //Weblap (super.super): wParams-ból helyretette url-t és s-t
+  //WeblapSeJ (super): dr-t és wParams-ból pill-t (inicPill-be) (ha volt, különben 0L marad) helyretette;
+  //  semmi mást, mert a seInic-et itt üresre írom felül (meg még a konzolra kiír, de azt jól teszi)
+  //de WeblapModell.inicAjax mindig tesz pill-t wParams-ba
+
+  //Ha van kopp= paraméter a wParams-ban: (akkor egy meglévő WeblapSe pill-je van benne):
+  //  akkor meg kell duplikálni a böngészőablakot, és url-be annak a lapnak az url-jét kell tenni
+  //  (innentől a klon meg a másodkonstruktor felesleges?)
+  ( //(pontosvessző-okoskodás elleni zárójel)
+    Option(wParams.get("kopp")).foreach
+      (pill =>
+        {
+          driver.ujAblakba(None)
+          url = WeblapModell.tartosWeblapok(pill(0).toLong).url
+        }
+      )
+  )
+
+  driver.get(url);
+  docHtml = driver.getPageSource();
+  linkek = linkek();
 
   var kattintanivalok = kattintaniValok
     //**/ println(s"konstruáláskor kattintanivalok=$kattintanivalok...?")
@@ -25,8 +49,10 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   var ablak = driver.getWindowHandle
   driver.ablakok += (ablak -> this)  //szintén a seInic-ből szorult ki
 
-    override def seInic =
-  {
+  inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
+
+    override def seInic = {}  // ezt a baromságot kiveszem innét
+  /*{
     //super.seInic
     //println("WeblapSe.scala seInic meghívva")  //oké, ezt hívja meg a "konstruktor"
 
@@ -43,12 +69,11 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 
     inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {driver.getTitle}</pre>
 
-  }
+  }*/
 
 /*
  * Másodlagos konstruktor duplikáláshoz
  */
-   
   def this (w1: WeblapSe)
   {
     this(WeblapSe.wParamUjra(w1.url, w1.s), w1.driver)
@@ -56,7 +81,12 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 
   def klon = // duplikátum új böngészőablakba, új WeblapModell.tartosWeblapok elembe
   {
-    
+    driver.ujAblakba(Some(this))  //új böngészőablak
+    var lap = new WeblapSe(this)  //duplikátum, ami be is teszi az új ablakot ablakok-ba
+    var most = Instant.now
+    lap.setInicPill(most)
+    //WeblapModell.tartosWeblapok.put(most.toEpochMilli, lap)        vagy: (elvégre nem a nyomorék java-ban vagyunk)
+    WeblapModell.tartosWeblapok += most.toEpochMilli -> lap
   }
 
   override def feldolg =
