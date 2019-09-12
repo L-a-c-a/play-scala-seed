@@ -13,6 +13,52 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
   //var ablakok: collection.mutable.Set[String] //= collection.mutable.Set()  //getWindowHandle(s) adta azonosítóknak
   var ablakok: collection.mutable.Map[String, WeblapSe]
   //ettől csak egy ablakok() meg egy ablakok_$eq(Set) lesz felülírnivaló, ablakok változó nem
+
+  def ablakStatusz(abl: String): scala.xml.Elem = // hátha így kell hívni valahonnan... de akkor mért nem inkább default-os második paraméter? ...mert abban nem lehet az első par.-re hivatkozni
+  {
+    //var lap = ablakok(abl) 
+    ablakStatusz(abl, ablakok(abl))
+  }
+
+  def ablakStatusz(abl: String, lap: WeblapSe) = // história hossza, előre, vissza, csukógomb...
+  {
+    switchTo.window(abl)
+    <div>
+    {abl}: {lap.driver.getCurrentUrl} |
+    história hossza: {histHossz} |
+    akt. históriaelem-státusz: {aktHistStat} |
+    akt. históriaelem-státusz.lap: {aktHistStatLap}
+    <button type="button" onclick={s"feldolggomb('&muvelet=ablakCsuk&par=$abl')"}>Csuk</button>
+    </div>
+  }
+
+  /* ablakStatusz alfunkciók
+   * 
+   */
+  def histHossz = executeScript("return history.length;").asInstanceOf[Long]
+
+  def aktHistStat = executeScript("return history.state;")  // a WeblapSe konstruáláskor rögtön beleír egy {lap: $Pill} alakú objektumot
+
+  def aktHistStatLap = executeScript("return history.state.lap;").asInstanceOf[Long]
+
+
+
+  def ablakMuv (pill: Long, muv: String, par: String): String =
+  {
+    var ret = s"QQQQQQQQQQ ablakMuv pill=$pill muv=$muv par=$par"
+    println(ret)
+    muv match
+    {
+      case "Csuk" => ablakCsuk(par)
+      case _ => "lapcim¤" + ret
+    }
+  }
+
+  def ablakCsuk (abl: String)/* bőngészőablakot bezárni, és a tartosWeblapok-ból kitörölni (vagy elárvítani: ablak=""), aminek ez az ablak-a */ =
+  {
+    s"lapcim¤$abl csukva"  // ajaxstatusz¤ nem jó, mert felülíródik
+  }
+
   def statusz: scala.xml.Elem    //ezeket a Sajat*Driver osztályokban kell implementálni... vagy itt lehet egy default implementáció
   =
     <div>
@@ -24,7 +70,11 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     }
     <h6>Többi ablak (ablakok)</h6>
     {
-      ablakok.map { case (abl, lap) => <div>{abl}: {lap.driver.getCurrentUrl}</div> }
+      var ablMent = getWindowHandle          //menteni és visszaállítani az ablakot! mert ablakStatusz elállítja!
+      var ret = ablakok.map { case (abl, lap) => ablakStatusz(abl, lap) }
+      // vagy: ablakok.keys.map(ablakStatusz(_))
+      switchTo.window(ablMent)
+      ret
     }
     <h6>Többi meghajtó (statikus)</h6>
     { SajatDriver.statikusStatusz }
@@ -100,6 +150,8 @@ object SajatDriver
 	import DrTip._
 	var meghajtok: scala.collection.mutable.Map[DrTip, SajatDriver] = scala.collection.mutable.Map.empty
 	//var meghajtoTipusok: scala.collection.mutable.Map[DrTip, SajatDriver.type] =
+	
+	def meghajto = meghajtok(aktMeghajtoTipus)
 
 	def ujMeghajtoTipusSzerint(tip: DrTip): SajatDriver =
 	{

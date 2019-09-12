@@ -5,7 +5,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 //import org.openqa.selenium.firefox.GeckoDriverService;
 //import org.openqa.selenium.firefox.XpiDriverService;
 
-public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver  //csak az eclipse jelez hibát, a play-nek jó
+public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver
 {
 	final static String driverHelye = "./public/geckodriver";  //ugyanis oda tettem (állítólag relatív is lehet, csak ./ -'el kezdődjön)
 	//static FirefoxOptions options = new FirefoxOptions();

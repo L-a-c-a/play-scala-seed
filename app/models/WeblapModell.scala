@@ -23,6 +23,7 @@ object WeblapModell
     {
       val pill=sor._1
       val lap=sor._2
+      // állítólag e kettő helyett jó lett volna: val (pill, lap) = sor
       s"""$pill ${java.time.Instant.ofEpochMilli(pill)}
           |<button onclick="feldolgajaxhivas($pill, '')">Újrafeldolg</button>
           |<button onclick="feldolgajaxhivas($pill, '&muvelet=csuk')">Csuk</button>
@@ -65,8 +66,8 @@ object WeblapModell
 
   def inicAjax (wParams: Map[String, Array[String]]): String =  //ezt kell hívni elsőnek az ajaxos .scala.html lapról
   {
-    var pillInstant = java.time.Instant.now
-    var pill = pillInstant.toEpochMilli
+    val pillInstant = java.time.Instant.now
+    val pill = pillInstant.toEpochMilli
     wParams.put("pill", Array(pill.toString))
     var ret = "ajaxinic¤" + inic(wParams)  //ettől lesz egy weblap a lap-ban
     //lap.setInicPill(pillInstant)  //igazából a konstruktorban lenne a helye
@@ -82,11 +83,13 @@ object WeblapModell
 
   def feldolg(pill: Long, muvelet: String, par: String): String =
   {
+    val ablakMuvRegex = "ablak(.*)".r  // pl. ablakCsuk --> case ablakMuvRegex(muv) => fn(muv)  --> fn("Csuk")
     muvelet match
     {
       case "csuk" => csuk(pill)
       case "statusz" => tartosWeblapokStatusz
       case "katt" => "lapcim¤" + tartosWeblapok(pill).katt(par)  //pill + " meg van kattintva"
+      case ablakMuvRegex(muv) => meghajto.ablakMuv(pill, muv, par)
       case _ => feldolg(pill)
     }
   }
@@ -98,7 +101,7 @@ object WeblapModell
     if (!tartosWeblapok.contains(pill)) return ret  // ehhez kell a : String is felül
     //és innen már van tartosWeblapok[pill]
      println (s"modell.feldolg($pill) hívás");
-    lap = tartosWeblapok.apply(pill)
+    lap = tartosWeblapok(pill)
     ret = lap.feldolg()
     //lap.close()
     //lehet, hogy scalátlan, de világos

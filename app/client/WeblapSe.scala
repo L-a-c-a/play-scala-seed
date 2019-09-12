@@ -34,6 +34,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   )
 
   driver.get(url);
+  driver.executeScript(s"history.replaceState({lap: ${inicPill.toEpochMilli}}, '');")
   docHtml = driver.getPageSource();
   linkek = linkek();
 
@@ -48,6 +49,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   var lapcim = driver.getTitle
   var ablak = driver.getWindowHandle
   driver.ablakok += (ablak -> this)  //szintén a seInic-ből szorult ki
+  var histSorsz = driver.histHossz;  //hányadik az ablak históriájában
 
   inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
 
@@ -141,6 +143,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     <div>url={url}</div>
     <div>drURL={drURL}</div>
     <div>ablak={ablak}</div>
+    <div>histSorsz={histSorsz}</div>
 
   override //üres ős a Weblap-ban
   def katt =
