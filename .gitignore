@@ -18,3 +18,5 @@ tmp/
 *gradle*
 /.worksheet
 # ez a scala worksheet (ws.sc) használatakor keletkezett
+/lib/
+*vscode*

@@ -31,6 +31,12 @@ public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver
   public void ablakok_$eq(scala.collection.mutable.Map<String, WeblapSe> s) { ablakok = s;}
   @Override
   public scala.collection.mutable.Map<String, WeblapSe> ablakok() { return ablakok;}
+  
+  public int histIndex = 0;
+  @Override
+  public void histIndex_$eq(Integer i) { histIndex = i; }
+  @Override
+  public Integer histIndex() { return histIndex; }
 /*
 	@Override
 	public String statusz()

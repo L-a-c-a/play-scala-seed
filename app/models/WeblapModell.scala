@@ -81,7 +81,7 @@ object WeblapModell
   def feldolg /*(wParams: Map[String, Array[String]]): String*/ = lap.feldolg
   // de valsz. nem kell neki a paraméter, mert már az inic-kor eltette magának
 
-  def feldolg(pill: Long, muvelet: String, par: String): String =
+  def feldolg(pill: Long, muvelet: String, par: String): String =   //ezt hívja weblapajaxfeldolg.scala.html
   {
     val ablakMuvRegex = "ablak(.*)".r  // pl. ablakCsuk --> case ablakMuvRegex(muv) => fn(muv)  --> fn("Csuk")
     muvelet match

@@ -95,7 +95,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   {
     feldolgPill = Instant.now
     val pill = feldolgPill.toEpochMilli
-    /* */ println("WeblapSe.feldolg() meghívva " + pill + " " + feldolgPill)
+    /* */ println("WeblapSe.feldolg() meghívva, feldolgPill = " + pill + " " + feldolgPill)
 
     var kepfajl = "screenshot" + inicPill + ".png"
     var htmlfajl = "drpagesource" + inicPill + ".html"

@@ -93,6 +93,16 @@ div.korlatozottmagassag1000
 {
 	z-index: 1;
 }
+
+#statusz
+{
+	background-color: cornsilk;
+}
+
+#uzen
+{
+	background-color: aliceblue;
+}
 </style>
 </head>
 <body>
@@ -109,6 +119,7 @@ div.korlatozottmagassag1000
 @Html(WeblapModell.ajaxAlapraForm(wParams))
 <div id=ajaxstatusz style="color: blue;"></div>
 <div id=statusz></div>
+<div id=uzen></div>
 <button onclick="statuszgomb()">Státusz</button>
 @Html(WeblapModell.ajaxForm(wParams))
 <script type="text/javascript">

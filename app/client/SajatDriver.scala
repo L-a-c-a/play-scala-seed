@@ -7,12 +7,16 @@ import org.openqa.selenium.Proxy
 
 import collection.JavaConverters._
 
+import models.WeblapModell._
+
 trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
 {
 	//def sajatProxy = SajatDriver.sajatProxyVal //ezt static kontextusból nem lehet hívni - marad a társobjektumban
   //var ablakok: collection.mutable.Set[String] //= collection.mutable.Set()  //getWindowHandle(s) adta azonosítóknak
   var ablakok: collection.mutable.Map[String, WeblapSe]
   //ettől csak egy ablakok() meg egy ablakok_$eq(Set) lesz felülírnivaló, ablakok változó nem
+
+  var histIndex: Integer  //ennyivel vagyunk visszább a históriában 
 
   def ablakStatusz(abl: String): scala.xml.Elem = // hátha így kell hívni valahonnan... de akkor mért nem inkább default-os második paraméter? ...mert abban nem lehet az első par.-re hivatkozni
   {
@@ -24,10 +28,13 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
   {
     switchTo.window(abl)
     <div>
-    {abl}: {lap.driver.getCurrentUrl} |
-    história hossza: {histHossz} |
-    akt. históriaelem-státusz: {aktHistStat} |
-    akt. históriaelem-státusz.lap: {aktHistStatLap}
+    {abl}: {lap.driver.getCurrentUrl}
+    | história hossza: {histHossz}
+    | akt. históriaelem-státusz: {aktHistStat}
+    <!-- | akt. históriaelem-státusz.lap: {aktHistStatLap} -->
+    | ennyivel visszább a históriában: {histIndex}
+    <button type="button" onclick={s"feldolggomb('&muvelet=ablakVissza&par=$abl')"} disabled={vaneVissza}>&lt;Vissza</button>
+    <button type="button" onclick={s"feldolggomb('&muvelet=ablakElore&par=$abl')"} disabled={vaneElore}>Előre&gt;</button>
     <button type="button" onclick={s"feldolggomb('&muvelet=ablakCsuk&par=$abl')"}>Csuk</button>
     </div>
   }
@@ -41,7 +48,16 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
 
   def aktHistStatLap = executeScript("return history.state.lap;").asInstanceOf[Long]
 
+  def vaneVissza: Option[xml.Text] = //mert egész attribútumot nem tehetek {}-be a literálban, de ha None-t vagy Null-t kap, eltünteti az attribútumot
+  {
+    /**/ println (s"histHossz=$histHossz  histIndex=$histIndex  különbség=${histHossz - histIndex}")
+    if (histHossz - histIndex > 1) None  //mert akkor van hova visszalépni
+    else  Some(xml.Text("disabled"))
+  }
 
+  def vaneElore: Option[xml.Text] = 
+    if (histIndex == 0) Some(xml.Text("disabled"))
+    else None
 
   def ablakMuv (pill: Long, muv: String, par: String): String =
   {
@@ -49,14 +65,34 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     println(ret)
     muv match
     {
+      case "Vissza" => ablakVissza(par)
+      case "Elore" => ablakElore(par)
       case "Csuk" => ablakCsuk(par)
-      case _ => "lapcim¤" + ret
+      case _ => "uzen¤" + ret
     }
+  }
+
+  def ablakVissza (abl: String) = // history.back, histIndex+=1, history.state.lap indexű lapot kivenni tartosWeblapok-ból és feldolg
+    //s"uzen¤$abl vissza eggyel"
+  {
+    executeScript("history.back();")
+    histIndex+=1
+    if (tartosWeblapok.contains(aktHistStatLap)) tartosWeblapok(aktHistStatLap).feldolg() + s"¤uzen¤$abl vissza eggyel"
+    else s"uzen¤nincs $aktHistStatLap a listában"
+  }
+
+  def ablakElore (abl: String) =
+  {
+    executeScript("history.forward();")
+    histIndex += -1
+    //tartosWeblapok.applyOrElse(aktHistStatLap, default).feldolg()
+    if (tartosWeblapok.contains(aktHistStatLap)) tartosWeblapok(aktHistStatLap).feldolg() + s"¤uzen¤$abl előre eggyel"
+    else s"uzen¤nincs $aktHistStatLap a listában"
   }
 
   def ablakCsuk (abl: String)/* bőngészőablakot bezárni, és a tartosWeblapok-ból kitörölni (vagy elárvítani: ablak=""), aminek ez az ablak-a */ =
   {
-    s"lapcim¤$abl csukva"  // ajaxstatusz¤ nem jó, mert felülíródik
+    s"uzen¤$abl csukva"  // ajaxstatusz¤ nem jó, mert felülíródik
   }
 
   def statusz: scala.xml.Elem    //ezeket a Sajat*Driver osztályokban kell implementálni... vagy itt lehet egy default implementáció
