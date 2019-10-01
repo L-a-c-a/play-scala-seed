@@ -33,10 +33,12 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     | akt. históriaelem-státusz: {aktHistStat}
     <!-- | akt. históriaelem-státusz.lap: {aktHistStatLap} -->
     | ennyivel visszább a históriában: {histIndex}
-    <button type="button" onclick={s"feldolggomb('&muvelet=ablakVissza&par=$abl')"} disabled={vaneVissza}>&lt;Vissza</button>
-    <button type="button" onclick={s"feldolggomb('&muvelet=ablakElore&par=$abl')"} disabled={vaneElore}>Előre&gt;</button>
-    <button type="button" onclick={s"feldolggomb('&muvelet=ablakCsuk&par=$abl')"}>Csuk</button>
+    <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakVissza&par=$abl')"} disabled={vaneVissza}>&lt;Vissza</button>
+    <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakFrissit')"}>Frissít</button>
+    <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakElore&par=$abl')"} disabled={vaneElore}>Előre&gt;</button>
+    <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakCsuk&par=$abl')"}>Csuk</button>
     </div>
+    // feldolggomb hülyeség volt, de így meg a par felesleges (Frissit új, annál már nincs)
   }
 
   /* ablakStatusz alfunkciók
@@ -66,6 +68,7 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     muv match
     {
       case "Vissza" => ablakVissza(par)
+      case "Frissit" => ablakFrissit(pill)
       case "Elore" => ablakElore(par)
       case "Csuk" => ablakCsuk(par)
       case _ => "uzen¤" + ret
@@ -78,6 +81,13 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     executeScript("history.back();")
     histIndex+=1
     if (tartosWeblapok.contains(aktHistStatLap)) tartosWeblapok(aktHistStatLap).feldolg() + s"¤uzen¤$abl vissza eggyel"
+    else s"uzen¤nincs $aktHistStatLap a listában"
+  }
+
+  def ablakFrissit(abl: Long) =
+  {
+    executeScript("history.go();")
+    if (tartosWeblapok.contains(aktHistStatLap)) tartosWeblapok(aktHistStatLap).feldolg() + s"¤uzen¤$abl frissítve (go())"
     else s"uzen¤nincs $aktHistStatLap a listában"
   }
 
