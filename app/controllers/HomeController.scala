@@ -93,6 +93,7 @@ object HomeController
   {
     //var parMap: Map[String, Seq[String]] = if (req.method=="GET") req.queryString else req.body.asFormUrlEncoded.getOrElse(Map(""->Seq("")))
     var parMap = req.body.asFormUrlEncoded getOrElse req.queryString
+    /***/ println (s"${Console.BOLD}HomeController.lapParam: parMap=$parMap req.path=${req.path} req.host= ${req.host}${Console.RESET}")
     var ret = new java.util.HashMap[String, Array[String]] (parMap.map { case (k,v) => (k, v.toArray) }.asJava)
     ret.put("host", Array((if (req.secure) "https://" else "http://") + req.host))
     ret.put("uri", Array(req.path))

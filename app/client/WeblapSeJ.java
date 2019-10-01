@@ -20,6 +20,9 @@ import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
+//import static scala.Console.*;
+//import static scala.io.AnsiColor.*;  egyik se megy
+
 /*
  * WeblapSe kezdeménye, még java-ban - amaz ennek a leszármazottja (most még?) 2019-06
  */
@@ -113,7 +116,7 @@ public class WeblapSeJ extends Weblap
 	{
 		super(wParams);
 		driver = dr;
-		/* */ System.out.println(wParamsStr(wParams));
+		/* */ System.out.println(wParamsStr(wParams, "\u001B[33m"/*Console.YELLOW*/));
 		if (wParams.containsKey("pill")) inicPill = Instant.ofEpochMilli(Long.parseLong(wParams.get("pill")[0]));
 		seInic();
 	}
@@ -235,5 +238,10 @@ public class WeblapSeJ extends Weblap
                   +",url="+((wParams.containsKey("url")) ? wParams.get("url")[0] : "")
                   +"}"
                   ;
+  }
+
+  public static String wParamsStr(Map<String, String[]> wParams, String ansi)
+  {
+    return ansi + wParamsStr(wParams) + "\u001B[0m";  //Console.RESET
   }
 }

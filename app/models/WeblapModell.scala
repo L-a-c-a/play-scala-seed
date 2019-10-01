@@ -3,6 +3,7 @@ package models
 //import java.util.HashMap
 import java.util.Map  //ha azt mondtam a Controllerben, hogy java.util.Map, akkor java.util.Map (a scala.collection.immutable.Map más)
 import scala.collection.JavaConverters.mutableMapAsJavaMap
+import java.time.Instant
 
 import client._
 
@@ -55,18 +56,33 @@ object WeblapModell
 
   def inic (wParams: Map[String, Array[String]]): String =  //ezt kell hívni elsőnek a .scala.html lapról
   {
+    /***/ println(s"${Console.BLUE}${Console.BOLD}inic kezd: ${Instant.now}; ${WeblapSeJ.wParamsStr(wParams)}${Console.RESET}")
     var s = ""
     //try { s = wParams.get("s")(0) } catch {case e:NullPointerException => }   vagy: (miért nem mindig így csináltam...)
     if (wParams.containsKey("s")) s = wParams.get("s")(0)    //vagy miért nem így: var s = (Option(wParams.get("s")) getOrElse Array(""))(0)
 
     lap = Weblap.apply(wParams, s)    // Weblap(wParams, s) nem műx: class client.Weblap is not a value
+    /***/ println(s"${Console.BLUE}${Console.BOLD}inic kész: ${Instant.now}; ${lap.getClass} példányosítva (${lap.getInicPill})${Console.RESET}")
     lap.getClass + " példányosítva"
     //.concat (lap.asInstanceOf[WeblapSe].getDriver.statusz.toString)  //TERv: gatyábaráznivaló 
   }
 
+  var folyamatban: Option[Instant] = None // inicAjax valamiért újra és újra meghívódik
+
   def inicAjax (wParams: Map[String, Array[String]]): String =  //ezt kell hívni elsőnek az ajaxos .scala.html lapról
   {
+    folyamatban match
+    {
+      case Some(p) =>
+      {
+        println (s"haggyámá, már csinálom $p ${p.toEpochMilli}")
+        return s"ajaxinic¤folyamatban <span id=idoLong>${p.toEpochMilli}</span> <span id=idoISO>$p</span>"
+      }
+      case None =>
+    }  //még mindig utálom a hosszú "else" és "case _" ágakat, ezért return
     val pillInstant = java.time.Instant.now
+    folyamatban = Some(pillInstant)
+    /***/ println(s"${Console.GREEN}inicAjax kezd: $pillInstant; ${WeblapSeJ.wParamsStr(wParams)}${Console.RESET}")
     val pill = pillInstant.toEpochMilli
     wParams.put("pill", Array(pill.toString))
     var ret = "ajaxinic¤" + inic(wParams)  //ettől lesz egy weblap a lap-ban
@@ -74,7 +90,10 @@ object WeblapModell
     //**/ println("inicEredm="+lap.getInicEredm)
     tartosWeblapok.put(pill, lap)
     ret += s"<div><span id=idoLong>$pill</span> <span id=idoISO>$pillInstant</span></div>"
-    ret += "<pre>" + lap.getInicEredm + "</pre>"
+    ret += /*"<pre>" +*/ lap.getInicEredm //+ "</pre>"
+    //***/ println(s"${Console.GREEN}inicAjax kész: ${Instant.now}; ${ret take 50}...${ret takeRight 50}${Console.RESET}")
+    /***/ println(s"${Console.GREEN}inicAjax kész: ${Instant.now}; ${ret.replaceFirst("tva<div>.*¤lapcim", "tva...\n...¤lapcim")}${Console.RESET}")
+    folyamatban = None
     ret
   }
 
@@ -83,6 +102,7 @@ object WeblapModell
 
   def feldolg(pill: Long, muvelet: String, par: String): String =   //ezt hívja weblapajaxfeldolg.scala.html
   {
+    /***/ println(s"""${Console.YELLOW}${Console.BOLD}feldolg($pill, "$muvelet", "$par") hívva${Console.RESET}""")
     val ablakMuvRegex = "ablak(.*)".r  // pl. ablakCsuk --> case ablakMuvRegex(muv) => fn(muv)  --> fn("Csuk")
     muvelet match
     {
@@ -94,19 +114,16 @@ object WeblapModell
     }
   }
 
-  def feldolg(pill: Long): String =
+  def feldolg(pill: Long) =
   {
-    //var ret = if (tartosWeblapok.contains(pill)) tartosWeblapok.apply(pill).feldolg else s"nincs már $pill kulcsú objektum a listában" - ez nem jó, ha több utasítás kell a then-ágba
-    var ret = s"nincs már $pill kulcsú objektum a listában" + tartosWeblapokStatusz
-    if (!tartosWeblapok.contains(pill)) return ret  // ehhez kell a : String is felül
-    //és innen már van tartosWeblapok[pill]
-     println (s"modell.feldolg($pill) hívás");
-    lap = tartosWeblapok(pill)
-    ret = lap.feldolg()
-    //lap.close()
-    //lehet, hogy scalátlan, de világos
-
-    ret //+ tartosWeblapokStatusz
+    /***/ println (s"modell.feldolg($pill) hívás");
+    if (!tartosWeblapok.contains(pill)) s"nincs már $pill kulcsú objektum a listában" //+ tartosWeblapokStatusz ??
+    else
+    {
+      lap = tartosWeblapok(pill)
+      lap.feldolg()
+      //lap.close()   ha ez nincs, kell-e a lap-ba betenni? kell-e egyáltalán a lap?
+    }
   }
 
   def csuk(pill: Long) =

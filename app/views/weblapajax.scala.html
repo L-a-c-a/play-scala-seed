@@ -124,16 +124,17 @@ div.korlatozottmagassag1000
 @Html(WeblapModell.ajaxForm(wParams))
 <script type="text/javascript">
 
-var ajaxobj = new XMLHttpRequest();
+//var ajaxobj = new XMLHttpRequest();  frász, mindenki használjon sajátot
 
 /* ajax onreadystatechange-nek @*
  * jó esetben a válasz elején egy id van, hova kell beszúrni
- * ajaxobj-'t használja (lehetne paraméter)
+ * ajaxobj-'t használja (lehetne paraméter) (MÁR AZ)
+ * @param ajaxobj
  * @param muvnev:String műveletnév, csak állapotkijelzéshez
  * @param tovabbi:function ha kész, további lépés
  * @param tovabbiPar az előbbi paramétere(i) *@
  */
-function ajaxvalasz(muvnev, tovabbi, ...tovabbiPar)
+function ajaxvalasz(ajaxobj, muvnev, tovabbi, ...tovabbiPar)
 {
 	console.log(`${muvnev} folyamatban, readystate=${ajaxobj.readyState}, státusz=${ajaxobj.status} ${ajaxobj.statusText}`);
 	if (ajaxobj.readyState == 4)
@@ -165,9 +166,11 @@ function inicgomb()
 
 function inicajaxhivas(cim)
 {
-	/* */ console.log("inicajaxhivas cim="+cim)
+  /* */ console.log("inicajaxhivas cim="+cim);
+  var ajaxobj = new XMLHttpRequest();
 	ajaxobj.open('GET', cim);
-	ajaxobj.onreadystatechange = function(){ajaxvalasz('inic', feldolggomb, '');} //közvetlenül az ajaxvalasz-t csak () nélkül lehetne odaadni neki, vagyis par. nélkül
+	ajaxobj.onreadystatechange = function(){ajaxvalasz(ajaxobj, 'inic', feldolggomb, '');} //közvetlenül az ajaxvalasz-t csak () nélkül lehetne odaadni neki, vagyis par. nélkül
+  /***/ console.log("ajaxobj.send előtt "+Date());
 	ajaxobj.send();
 	ajaxstatuszdiv.innerHTML = "inic folyamatban...";
 }
@@ -179,9 +182,10 @@ function feldolggomb(pluszpar)
 
 function feldolgajaxhivas(pill, pluszpar)
 {
-	console.log(`feldolgajaxhivas($pill, $pluszpar) ` + 'weblapajaxfeldolg?pill=' + pill + pluszpar);
+  console.log(`feldolgajaxhivas(${pill}, ${pluszpar}) ` + 'weblapajaxfeldolg?pill=' + pill + pluszpar);
+  var ajaxobj = new XMLHttpRequest();
 	ajaxobj.open('GET', 'weblapajaxfeldolg?pill=' + pill + pluszpar);
-	ajaxobj.onreadystatechange = function(){ajaxvalasz('feldolg', statuszgomb);}
+	ajaxobj.onreadystatechange = function(){ajaxvalasz(ajaxobj, 'feldolg', statuszgomb);}
 /*
 	{
 		console.log("feldolg folyamatban, readystate=" + ajaxobj.readyState + ", státusz=" + ajaxobj.status + " " + ajaxobj.statusText);
@@ -202,6 +206,7 @@ function feldolgajaxhivas(pill, pluszpar)
 
 function statuszgomb()
 {
+  var ajaxobj = new XMLHttpRequest();
   ajaxobj.open('GET', 'weblapajaxfeldolg?pill=0&muvelet=statusz');
   ajaxobj.onreadystatechange = function()
   {

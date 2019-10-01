@@ -14,6 +14,7 @@ public class Weblap
 
   java.time.Instant inicPill = java.time.Instant.ofEpochMilli(0L);
   public void setInicPill(java.time.Instant pill) { inicPill = pill; }
+  public java.time.Instant getInicPill() { return inicPill; }
 
   public String getInicEredm() { return ""; }   //majd a leszármazottban csinál valamit
 

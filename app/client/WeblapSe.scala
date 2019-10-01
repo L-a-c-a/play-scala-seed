@@ -23,6 +23,9 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   //Ha van kopp= paraméter a wParams-ban: (akkor egy meglévő WeblapSe pill-je van benne):
   //  akkor meg kell duplikálni a böngészőablakot, és url-be annak a lapnak az url-jét kell tenni
   //  (innentől a klon meg a másodkonstruktor felesleges?)
+
+//////// KONSTRUKTOR //////////////////
+
   ( //(pontosvessző-okoskodás elleni zárójel)
     Option(wParams.get("kopp")).foreach
       (pill =>
@@ -33,10 +36,28 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
       )
   )
 
+  /***/ println(s"${Console.CYAN}driver.get kezd: ${Instant.now}${Console.RESET}")
   driver.get(url);
+  /***/ println(s"${Console.CYAN}driver.get kész: ${Instant.now}${Console.RESET}")
   driver.executeScript(s"history.replaceState({lap: ${inicPill.toEpochMilli}}, '');")
+  /***/ println(s"${Console.CYAN}driver.executeScript kész: ${Instant.now}${Console.RESET}")
   docHtml = driver.getPageSource();
+  /***/ println(s"${Console.CYAN}driver.getPageSource kész: ${Instant.now}${Console.RESET}")
   linkek = linkek();
+
+  var drURL = driver.getCurrentUrl  //a Weblap-ban már van egy url, a wParams-ban kapott
+  /***/ println(s"${Console.CYAN}driver.getCurrentUrl kész: $drURL ${Instant.now}${Console.RESET}")
+  var lapcim = driver.getTitle
+  /***/ println(s"${Console.CYAN}driver.getTitle kész: $lapcim ${Instant.now}${Console.RESET}")
+  var ablak = driver.getWindowHandle
+  /***/ println(s"${Console.CYAN}driver.getWindowHandle kész: $ablak ${Instant.now}${Console.RESET}")
+  //***/ println(s"${Console.CYAN}drURL=$drURL lapcim=$lapcim ablak=$ablak ${Instant.now}${Console.RESET}")
+  driver.ablakok += (ablak -> this)  //szintén a seInic-ből szorult ki
+  var histSorsz = driver.histHossz;  //hányadik az ablak históriájában
+
+  inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
+
+//////// KONSTRUKTOR idáig; innentől csak def-ek  vannak
 
   var kattintanivalok = kattintaniValok
     //**/ println(s"konstruáláskor kattintanivalok=$kattintanivalok...?")
@@ -45,15 +66,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   def kattintaniValok() =
     "kattintanivalók"
 
-  var drURL = driver.getCurrentUrl  //a Weblap-ban már van egy url, a wParams-ban kapott
-  var lapcim = driver.getTitle
-  var ablak = driver.getWindowHandle
-  driver.ablakok += (ablak -> this)  //szintén a seInic-ből szorult ki
-  var histSorsz = driver.histHossz;  //hányadik az ablak históriájában
-
-  inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
-
-    override def seInic = {}  // ezt a baromságot kiveszem innét
+  override def seInic = {}  // ezt a baromságot kiveszem innét
   /*{
     //super.seInic
     //println("WeblapSe.scala seInic meghívva")  //oké, ezt hívja meg a "konstruktor"
