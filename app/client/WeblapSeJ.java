@@ -81,15 +81,15 @@ public class WeblapSeJ extends Weblap
 				elem ->
 		{ String absHref = Optional.ofNullable(elem.getAttribute("href")).orElse("[nincs href]"); // getAttribute beleokoskodik és abszolút címet ad!
 		  String relHref = Optional.ofNullable((String) driver.executeScript("return arguments[0].getAttribute('href');", elem)).orElse("[nincs href]");
-      //**/ System.out.println ("|"+absHref+"|"); //getAttribute még /-t is tesz a szerver végére
-      //**/ System.out.println ("|"+relHref+"|");
-      String fahOnclickVaz = "feldolgajaxhivas('" + inicPill.toEpochMilli() + "', '&muvelet=katt&par=%s');";  //%s-'el sprintf-hez... helyett String.format-hoz
-      String fahOnclick = "";
-      try
-      { fahOnclick= String.format(fahOnclickVaz, java.net.URLEncoder.encode(generateXPATH(elem, ""), "UTF-8"));
-      }catch (java.io.UnsupportedEncodingException e) { /*anyád*/ }
-      String fahOnclickEmberi = String.format(fahOnclickVaz, generateXPATH(elem, ""));
-      //**/ System.out.println ("fahOnclick=" + fahOnclick);
+      /**/ System.out.println ("|"+absHref+"|"); //getAttribute még /-t is tesz a szerver végére
+      /**/ System.out.println ("|"+relHref+"|");
+      //String fahOnclickVaz = "feldolgajaxhivas('" + inicPill.toEpochMilli() + "', '&muvelet=katt&par=%s');";  //%s-'el sprintf-hez... helyett String.format-hoz
+      //String fahOnclick = "";
+      //try
+      //{ fahOnclick= String.format(fahOnclickVaz, java.net.URLEncoder.encode(generateXPATHpot(elem, ""), "UTF-8"));
+      //}catch (java.io.UnsupportedEncodingException e) { /*anyád*/ }
+      //String fahOnclickEmberi = String.format(fahOnclickVaz, generateXPATHpot(elem, ""));
+      ///**/ System.out.println ("fahOnclickEmberi=" + fahOnclickEmberi);
 			return "<div>"
 			    + relHref 
 			    + (relHref.replace("/", "").equals(absHref.replace("/", "")) ? " " : " (" + absHref +  ") ")  //replaceAll-t akartam, de így is jó
@@ -102,7 +102,7 @@ public class WeblapSeJ extends Weblap
 					  ? "<button class=alacsonygomb disabled>ne nyomjad</button>"
             : "<button class=alacsonygomb onclick='inicajaxhivas(\"weblapajaxinic?url=" + elem.getAttribute("href") + "&s=" + s + "\");'>nyomjad</button>"
             )
-          + "<button class=alacsonygomb onclick=\"" + fahOnclick + "\" title=\"" + fahOnclickEmberi + "\">katt</button>"
+          //+ "<button class=alacsonygomb onclick=\"" + fahOnclick + "\" title=\"" + fahOnclickEmberi + "\">katt</button>"
           //+ "<button class=alacsonygomb onclick='this.click();'>katt(JS)</button>" ez így egy baromság; azonosítani kéne a célelemet (hogy a tökbe?), és azt kattintani
 					+ "</div>";
 		};
@@ -122,7 +122,7 @@ public class WeblapSeJ extends Weblap
 	}
 	
 	@Override
-	public String feldolg()
+	public String feldolg(String... pp)
 	{
 	  feldolgPill = Instant.now();
 	  Long pill = feldolgPill.toEpochMilli();

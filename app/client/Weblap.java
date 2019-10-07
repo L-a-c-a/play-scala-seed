@@ -36,7 +36,7 @@ public class Weblap
     if (wParams.containsKey("s")) s = wParams.get("s")[0];
   }
 
-  public String feldolg()
+  public String feldolg(String... pp)
   {
     return "Feldolgozás";
   }

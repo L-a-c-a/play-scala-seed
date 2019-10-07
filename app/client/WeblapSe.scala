@@ -8,6 +8,9 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies
 import java.io.File
 import javax.imageio.ImageIO
 import java.io.PrintWriter
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import collection.JavaConverters._
 
 import models.WeblapModell
 
@@ -43,7 +46,12 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   /***/ println(s"${Console.CYAN}driver.executeScript kész: ${Instant.now}${Console.RESET}")
   docHtml = driver.getPageSource();
   /***/ println(s"${Console.CYAN}driver.getPageSource kész: ${Instant.now}${Console.RESET}")
-  linkek = linkek();
+
+  //linkek = linkek(); WeblapSeJ::linkek() baromi lassú
+  linkek = """majd egyszer... ("eventuálisan!")"""
+  var linkekList = driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
+  linkek = linkekList.map(elembolHtml).foldLeft("")(_+_)
+  /***/ println(s"${Console.CYAN}linkekList kész: ${linkekList.size} db elem ${Instant.now}${Console.RESET}")
 
   var drURL = driver.getCurrentUrl  //a Weblap-ban már van egy url, a wParams-ban kapott
   /***/ println(s"${Console.CYAN}driver.getCurrentUrl kész: $drURL ${Instant.now}${Console.RESET}")
@@ -58,6 +66,17 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
 
 //////// KONSTRUKTOR idáig; innentől csak def-ek  vannak
+
+  def elembolHtml(elem: WebElement): String =
+  {
+    val absHref = Option(elem.getAttribute("href")) getOrElse "[nincs href]"
+    val relHref = Option(driver.executeScript("return arguments[0].getAttribute('href');", elem).asInstanceOf[String]) getOrElse "[nincs href]"
+    var absHrefHa = ""
+    if (relHref.replaceAll("/", "") != absHref.replaceAll("/", "")) absHrefHa = s"($absHref)"
+    var gombHa = s"""<button class=alacsonygomb onclick='inicajaxhivas("weblapajaxinic?url=$absHref&s=$s")'>nyomjad</button>"""
+    if (relHref == "[nincs href]") gombHa = "<button class=alacsonygomb disabled>ne nyomjad</button>"
+    s"<div>$relHref $absHrefHa $gombHa</div>"
+  }
 
   var kattintanivalok = kattintaniValok
     //**/ println(s"konstruáláskor kattintanivalok=$kattintanivalok...?")
@@ -104,7 +123,15 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     WeblapModell.tartosWeblapok += most.toEpochMilli -> lap
   }
 
-  override def feldolg =
+  override def feldolg(pp: String*) =
+  {
+    pp.length match
+    {
+      case 0 => simaFeldolg
+    }
+  }
+
+  def simaFeldolg =
   {
     feldolgPill = Instant.now
     val pill = feldolgPill.toEpochMilli

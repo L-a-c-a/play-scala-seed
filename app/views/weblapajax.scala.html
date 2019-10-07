@@ -183,6 +183,7 @@ function feldolggomb(pluszpar)
 function feldolgajaxhivas(pill, pluszpar)
 {
   console.log(`feldolgajaxhivas(${pill}, ${pluszpar}) ` + 'weblapajaxfeldolg?pill=' + pill + pluszpar);
+  uzendiv.innerHTML = "";
   var ajaxobj = new XMLHttpRequest();
 	ajaxobj.open('GET', 'weblapajaxfeldolg?pill=' + pill + pluszpar);
 	ajaxobj.onreadystatechange = function(){ajaxvalasz(ajaxobj, 'feldolg', statuszgomb);}
@@ -227,6 +228,7 @@ var ajaxstatuszdiv = document.getElementById("ajaxstatusz");
 var statuszdiv = document.getElementById("statusz");
 var inicdiv = document.getElementById("ajaxinic");
 var feldolgdiv = document.getElementById("ajaxfeldolg");
+var uzendiv = document.getElementById("uzen")
 </script>
 
 <!-- @*   twirl-ül is ki kell kommentelni!! (vagy csak úgy)
