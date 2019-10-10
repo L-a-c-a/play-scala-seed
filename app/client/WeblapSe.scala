@@ -75,7 +75,9 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     if (relHref.replaceAll("/", "") != absHref.replaceAll("/", "")) absHrefHa = s"($absHref)"
     var gombHa = s"""<button class=alacsonygomb onclick='inicajaxhivas("weblapajaxinic?url=$absHref&s=$s")'>nyomjad</button>"""
     if (relHref == "[nincs href]") gombHa = "<button class=alacsonygomb disabled>ne nyomjad</button>"
-    s"<div>$relHref $absHrefHa $gombHa</div>"
+    val onclickTmp = s"""feldolgajaxhivas(${inicPill.toEpochMilli}, "&muvelet=lapReszl&par=${linkekList.indexOf(elem)}"); document.querySelector("#checkbox15").click()"""
+    val reszlGomb = s"<button class=alacsonygomb onclick='$onclickTmp'>több</button>"
+    s"<div>$relHref $absHrefHa $gombHa $reszlGomb</div>"
   }
 
   var kattintanivalok = kattintaniValok
@@ -127,7 +129,8 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   {
     pp.length match
     {
-      case 0 => simaFeldolg
+      case 2 => feldolg2par(pp(0), pp(1))
+      case _ => simaFeldolg
     }
   }
 
@@ -165,6 +168,17 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     ret
   }
 
+  def feldolg2par(muv:String, par:String) =
+  { // ha lesz többféle művelet, akkor ide match
+    s"kattintanivalok¤${elembolHtmlReszl(par.toInt)}"
+  }
+
+  def elembolHtmlReszl (elemindex: Int) =
+  {
+    val elem = linkekList(elemindex)
+    s"$elemindex. elem meg van kattintva"
+  }
+
   override // Weblap-é az ős
   def statusz = s"$s $feldobosStatusz $lapcim"
 
@@ -185,6 +199,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     <div>ablak={ablak}</div>
     <div>histSorsz={histSorsz}</div>
 
+/*
   override //üres ős a Weblap-ban
   def katt =
   {
@@ -199,7 +214,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     //driver.findElement(org.openqa.selenium.By.xpath(xpath)).click
     inicPill + " meg van kattintva, xpath=" + xpath
   }
-
+*/
 }
 
 object WeblapSe

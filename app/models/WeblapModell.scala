@@ -104,12 +104,15 @@ object WeblapModell
   {
     /***/ println(s"""${Console.YELLOW}${Console.BOLD}feldolg($pill, "$muvelet", "$par") hívva${Console.RESET}""")
     val ablakMuvRegex = "ablak(.*)".r  // pl. ablakCsuk --> case ablakMuvRegex(muv) => fn(muv)  --> fn("Csuk")
+    val lapMuvRegex = "lap(.*)".r
     muvelet match
     {
       case "csuk" => csuk(pill)
       case "statusz" => tartosWeblapokStatusz
-      case "katt" => "lapcim¤" + tartosWeblapok(pill).katt(par)  //pill + " meg van kattintva"
+      //case "katt" => "lapcim¤" + tartosWeblapok(pill).katt(par)  //pill + " meg van kattintva"
+      //case "katt" => tartosWeblapok(pill).feldolg(muvelet, par)  //pill + " meg van kattintva"
       case ablakMuvRegex(muv) => meghajto.ablakMuv(pill, muv, par)
+      case lapMuvRegex(muv) => tartosWeblapok(pill).feldolg(muv, par)
       case _ => feldolg(pill)
     }
   }

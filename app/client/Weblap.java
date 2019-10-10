@@ -48,8 +48,8 @@ public class Weblap
 
   public String statusz() { return String.format("%s %s %s", java.time.format.DateTimeFormatter.ISO_INSTANT.format(inicPill), url, s); }
 
-  public String katt() { return ""; }   //majd a leszármazottban csinál valamit
-  public String katt(String par) { return ""; }   //majd a leszármazottban csinál valamit
+  //public String katt() { return ""; }   //majd a leszármazottban csinál valamit
+  //public String katt(String par) { return ""; }   //majd a leszármazottban csinál valamit
 
   //hátha javában is működik
   public static Weblap apply(Map<String, String[]> wParams, String s)
