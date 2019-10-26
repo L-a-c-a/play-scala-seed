@@ -161,7 +161,16 @@ function inicgomb()
 	console.log('Inic meg van nyomva');
 	var formelemek = document.forms.inicform.elements;
 	//**/ console.log(  'weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
-	inicajaxhivas('weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+  //**/ console.log(formelemek)
+  //**/ console.log(Array.from(formelemek))
+  ///**/ console.log(Array.from(formelemek).map(elem => ".name="+elem.name).join())
+  ///**/ console.log(Array.from(formelemek).map(elem => ".nodeName="+elem.nodeName).join())
+  ///**/ console.log(Array.from(formelemek).map(elem => ".getAttribute(name)="+elem.getAttribute("name")).join())
+  //**/ console.log(Array.from(formelemek).filter(elem => elem.tagName.toUpperCase()=="INPUT"))
+  //**/ console.log(Array.from(formelemek).filter(elem => elem.tagName.toUpperCase()=="INPUT").map(elem => `${elem.name}=${elem.value}`))
+  //**/ console.log(Array.from(formelemek).filter(elem => elem.tagName.toUpperCase()=="INPUT").map(elem => `${elem.name}=${elem.value}`).join('&'))
+	//inicajaxhivas('weblapajaxinic?url=' + formelemek.url.value + '&s=' + formelemek.s.value);
+  inicajaxhivas('weblapajaxinic?' + Array.from(formelemek).filter(elem => elem.tagName.toUpperCase()=="INPUT").map(elem => `${elem.name}=${elem.value}`).join('&'))
 }
 
 function inicajaxhivas(cim)
@@ -217,6 +226,33 @@ function statuszgomb()
   ajaxobj.send();
   statuszdiv.innerHTML = "státusz... mindjárt";
 }
+
+function ujParamGomb(aGomb)
+{
+  console.log(this)  //this, az a Window
+  console.log(aGomb)  //maga a gomb, ha az onclick-ből this-'el hívták
+  var nev = prompt("Név:")
+  var ujdiv = document.createElement('div')
+  ujdiv.innerHTML = `${nev}<input name="${nev}" value="">`
+  aGomb.parentElement.prepend(ujdiv)
+}
+
+function ujKukiGomb(aGomb)
+{
+  var nev = prompt("Név:")
+  var ujdiv = document.createElement('div')
+  ujdiv.innerHTML = `<input name="kuki" type="hidden" value="${nev}">kuki ${nev}<input name="${nev}" value="">`
+  aGomb.parentElement.prepend(ujdiv)
+}
+
+function ujSessKukiGomb(aGomb)
+{
+  var nev = "PHPSESSID"
+  var ujdiv = document.createElement('div')
+  ujdiv.innerHTML = `<input name="kuki" type="hidden" value="${nev}">kuki ${nev}<input name="${nev}" value="">`
+  aGomb.parentElement.prepend(ujdiv)
+}
+
 </script>
 <div id=ajaxinic>ajaxinic kimenet helye</div>
 <button type="button" onclick="inicgomb()">Inic</button>

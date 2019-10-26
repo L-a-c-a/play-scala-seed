@@ -13,7 +13,7 @@ public class SajatFirefoxDriver extends FirefoxDriver implements SajatDriver
 	{
 		FirefoxOptions ffo = new FirefoxOptions();
 		ffo.setHeadless(true);
-		ffo.setProxy(SajatDriver$.MODULE$.sajatProxy()); //így eszi csak meg: $.MODULE$. és () (társobjektumból egy val)
+		//ffo.setProxy(SajatDriver$.MODULE$.sajatProxy()); //így eszi csak meg: $.MODULE$. és () (társobjektumból egy val)
 		System.setProperty("webdriver.gecko.driver", driverHelye);
 		return ffo;
 	}

@@ -40,7 +40,12 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   )
 
   /***/ println(s"${Console.CYAN}driver.get kezd: ${Instant.now}${Console.RESET}")
-  driver.get(url);
+  if (url.length>0)  //ha meg üres, a lap már be van töltve a böngészőbe, és ahhoz kell új példány (ld. másodlagos konstruktor(dr))
+  {
+    driver.get(url);  //állítólag így kell; enélkül InvalidCookieDomainException: Document is cookie-averse
+    kukikAlk
+    driver.get(url);
+  }
   /***/ println(s"${Console.CYAN}driver.get kész: ${Instant.now}${Console.RESET}")
   driver.executeScript(s"history.replaceState({lap: ${inicPill.toEpochMilli}}, '');")
   /***/ println(s"${Console.CYAN}driver.executeScript kész: ${Instant.now}${Console.RESET}")
@@ -49,7 +54,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 
   //linkek = linkek(); WeblapSeJ::linkek() baromi lassú
   linkek = """majd egyszer... ("eventuálisan!")"""
-  var linkekList = driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
+  var linkekList = linkekListFeltolt //driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
   linkek = linkekList.map(elembolHtml).foldLeft("")(_+_)
   /***/ println(s"${Console.CYAN}linkekList kész: ${linkekList.size} db elem ${Instant.now}${Console.RESET}")
 
@@ -63,9 +68,30 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   driver.ablakok += (ablak -> this)  //szintén a seInic-ből szorult ki
   var histSorsz = driver.histHossz;  //hányadik az ablak históriájában
 
+  var kukik = driver.manage.getCookies.asScala
+
   inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
 
 //////// KONSTRUKTOR idáig; innentől csak def-ek  vannak
+
+  // paraméterben jött kukik alkalmazása - nem függvény, procedúra; ez teszi bele, mert csak egyenként lehet
+  def kukikAlk =
+  {
+    //var q = wParams.get("kuki") //Array[String]   [ "PHPSESSID"]  vagy null, mert javás Map
+    var q = Option(wParams.get("kuki")).getOrElse(Array())
+    /**/ println(s"wParams:$wParams kukik:$q")
+    (
+      q.foreach
+      { nev =>
+        {
+          var ert = wParams.get(nev)(0)
+          /**/ println(s"név=$nev érték=$ert")
+          driver.manage.deleteCookieNamed(nev)  //különben két olyan kuki lesz, és az eddigi lehet érvényes továbbra is
+          driver.manage.addCookie(new org.openqa.selenium.Cookie(nev, ert))
+        }
+      }
+    )
+  }
 
   def elembolHtml(elem: WebElement): String =
   {
@@ -87,25 +113,11 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   def kattintaniValok() =
     "kattintanivalók"
 
+  def linkekListFeltolt = driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
+
+  def linkekListFrissit = linkekList = linkekListFeltolt
+
   override def seInic = {}  // ezt a baromságot kiveszem innét
-  /*{
-    //super.seInic
-    //println("WeblapSe.scala seInic meghívva")  //oké, ezt hívja meg a "konstruktor"
-
-    //előlről
-    /**/ println("driver.get hívás előtt url="+url)
-    //**/ println("feldolgHtml="+WeblapSe.feldolgHtml)  //null, ha az osztályban van (és nem "static")
-    //driver.ujAblakba  //ez itt piszok rossz helyen van --> végtelen ciklus ...hacsak másképp nem csinálom
-    //if (url!="about:blank") driver.ujAblakba  //de ezt meg kéne tisztábban csinálni! TERV!
-    driver.get(url);
-    docHtml = driver.getPageSource();
-    linkek = linkek(); // ezt inickor kell
-    //kattintanivalok = kattintaniValok()   itt korai, mert előbb hajtódik végre, mint a kattintanivalok definiálása
-    //**/ println(s"kattintanivalok=$kattintanivalok...mé?")
-
-    inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {driver.getTitle}</pre>
-
-  }*/
 
 /*
  * Másodlagos konstruktor duplikáláshoz
@@ -113,6 +125,13 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   def this (w1: WeblapSe)
   {
     this(WeblapSe.wParamUjra(w1.url, w1.s), w1.driver)
+  }
+/*
+ * Másodlagos konstruktor a már böngészőbe betöltött laphoz
+ */
+  def this (dr: SajatDriver)
+  {
+    this(WeblapSe.wParamUjra("", "Se"), dr)
   }
 
   def klon = // duplikátum új böngészőablakba, új WeblapModell.tartosWeblapok elembe
@@ -169,14 +188,59 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   }
 
   def feldolg2par(muv:String, par:String) =
-  { // ha lesz többféle művelet, akkor ide match
-    s"kattintanivalok¤${elembolHtmlReszl(par.toInt)}"
+  {
+    muv match
+    {
+      case "Reszl" => s"kattintanivalok¤${elembolHtmlReszl(par.toInt)}"
+      case "Katt" => katt(par.toInt)
+    }
   }
 
   def elembolHtmlReszl (elemindex: Int) =
   {
     val elem = linkekList(elemindex)
-    s"$elemindex. elem meg van kattintva"
+    val jsMiEz = xml.Utility.escape(driver.executeScript("return arguments[0].outerHTML", elem).asInstanceOf[String])
+    val onclickKattTmp = s"""feldolgajaxhivas(${inicPill.toEpochMilli}, "&muvelet=lapKatt&par=$elemindex")"""
+    val kattGomb = <button class='alacsonygomb' onclick={onclickKattTmp}>katt</button>
+
+    val elembolHtmlReszlLink =
+    {
+      Option(elem.getAttribute("href")) match
+      {
+        case None => ""
+        case Some(absHref) => 
+        {
+          val relHref = driver.executeScript("return arguments[0].getAttribute('href');", elem).asInstanceOf[String]   //felt.: ha van absHref, akkor relHref is van, nem kell opciózni
+          val absHrefHa = if (relHref.replaceAll("/", "") != absHref.replaceAll("/", "")) s"($absHref)" else ""
+          val onclickTmp = s"""inicajaxhivas("weblapajaxinic?url=${absHref}&s=${s}")"""
+          val gomb = <button onclick={onclickTmp}>nyomjad</button>
+          s"$relHref $absHrefHa $gomb"
+        }
+      }
+    }
+
+    s"$elemindex. elem: $jsMiEz $kattGomb $elembolHtmlReszlLink"
+  }
+
+  def katt(elemindex: Int) =
+  {
+    linkekList(elemindex).click  //továbbra sem javasolt linknél; betölti az új lapot, de WeblapSe objektumot nem konstruál
+    val feldolgEredm =
+      if (drURL == driver.getCurrentUrl)  //maradtunk a lapon, de újra"feldolg"ozni nem árt, mert tudjisten mi történt a DOM-ban (lehet, hogy csak onclick esetben kellene)
+      {
+        /* if (stale) */
+        {
+          linkekListFrissit
+          driver.executeScript(s"history.replaceState({lap: ${inicPill.toEpochMilli}}, '');")  //ugyanis ez is eltűnik ilyenkor
+        } 
+        simaFeldolg
+      }else //akkor meg új példány kell
+      {
+        val lap = new WeblapSe(driver)
+        WeblapModell.tartosWeblapok += lap.getInicPill.toEpochMilli -> lap
+        lap.simaFeldolg
+      }
+    s"$feldolgEredm¤uzen¤$elemindex. elem meg van kattintva"
   }
 
   override // Weblap-é az ős
@@ -198,6 +262,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     <div>drURL={drURL}</div>
     <div>ablak={ablak}</div>
     <div>histSorsz={histSorsz}</div>
+    <div>{kukik.map(k => <div>{k.toString}</div>)}</div>
 
 /*
   override //üres ős a Weblap-ban

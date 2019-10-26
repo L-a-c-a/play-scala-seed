@@ -164,7 +164,13 @@ object WeblapModell
            , pluszelem //további inputok (pl. kuki), nyomógomb...
            )
 
-  def ajaxForm (wParams: Map[String, Array[String]]): String = ajaxForm(wParams, "id=inicform action=weblapajaxinic", "")
+  //pluszelemnek:
+  def ujParamGomb = <button id="ujparamgomb" onclick="ujParamGomb(this); return false">További paraméter</button>
+  def ujKukiGomb = <button id="ujkukigomb" onclick="ujKukiGomb(this); return false">Új kuki</button>
+  def ujSessKukiGomb = <button id="ujsesskukigomb" onclick="ujSessKukiGomb(this); return false">Új PHPSESSID kuki</button>
+  def ujGombok = <div>{ujParamGomb} {ujKukiGomb} {ujSessKukiGomb}</div>
+
+  def ajaxForm (wParams: Map[String, Array[String]]): String = ajaxForm(wParams, "id=inicform action=weblapajaxinic", ujGombok.toString)
   def ajaxAlapraForm (wParams: Map[String, Array[String]]): String = ajaxForm(wParams, "action=weblapajax", """<br><input type="submit" name="mehet" value="alapra">""")
 
 }

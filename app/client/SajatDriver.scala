@@ -36,7 +36,8 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakVissza&par=$abl')"} disabled={vaneVissza}>&lt;Vissza</button>
     <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakFrissit')"}>Frissít</button>
     <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakElore&par=$abl')"} disabled={vaneElore}>Előre&gt;</button>
-    <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakCsuk&par=$abl')"}>Csuk</button>
+    <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakCsuk&par=$abl')"} disabled={vanemegAblak}>Csuk</button>
+    <button type="button" onclick={s"feldolgajaxhivas($abl, '&muvelet=ablakUjLap&par=$abl')"}>Új lap</button>
     </div>
     // feldolggomb hülyeség volt, de így meg a par felesleges (Frissit új, annál már nincs)
   }
@@ -61,6 +62,10 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     if (histIndex == 0) Some(xml.Text("disabled"))
     else None
 
+  def vanemegAblak: Option[xml.Text] = 
+    if (getWindowHandles.size > 1) None
+    else  Some(xml.Text("disabled"))
+
   def ablakMuv (pill: Long, muv: String, par: String): String =
   {
     var ret = s"QQQQQQQQQQ ablakMuv pill=$pill muv=$muv par=$par"
@@ -71,6 +76,7 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
       case "Frissit" => ablakFrissit(pill)
       case "Elore" => ablakElore(par)
       case "Csuk" => ablakCsuk(par)
+      case "UjLap" => ablakUjLap(par)
       case _ => "uzen¤" + ret
     }
   }
@@ -87,7 +93,12 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
   def ablakFrissit(abl: Long) =
   {
     executeScript("history.go();")
-    if (tartosWeblapok.contains(aktHistStatLap)) tartosWeblapok(aktHistStatLap).feldolg() + s"¤uzen¤$abl frissítve (go())"
+    if (tartosWeblapok.contains(aktHistStatLap))
+    {
+      val lap = tartosWeblapok(aktHistStatLap).asInstanceOf[WeblapSe]
+      lap.linkekListFrissit
+      lap.feldolg() + s"¤uzen¤$abl frissítve (go() és linkekListFrissit)"
+    }
     else s"uzen¤nincs $aktHistStatLap a listában"
   }
 
@@ -100,9 +111,26 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     else s"uzen¤nincs $aktHistStatLap a listában"
   }
 
-  def ablakCsuk (abl: String)/* bőngészőablakot bezárni, és a tartosWeblapok-ból kitörölni (vagy elárvítani: ablak=""), aminek ez az ablak-a */ =
+  def ablakCsuk (abl: String) /* bőngészőablakot bezárni, és a tartosWeblapok-ból kitörölni (vagy elárvítani: ablak=""), aminek ez az ablak-a */ =
   {
+    /***/println("ablakCsuk getWindowHandles.size="+ getWindowHandles.size)
+    /***/println("ablakCsuk getWindowHandle="+ getWindowHandle)
+    close
+    //...egy másik "ablakot" kell aktuálissá tenni, ha még van
+    //ja, és a saját listából meg kiszedni!
+    ablakok -= abl
+    /***/println("ablakCsuk getWindowHandles.size="+ getWindowHandles.size)
+    switchTo.window(getWindowHandles.asScala.head)
+    /***/println("ablakCsuk getWindowHandle="+ getWindowHandle)
+    //...
     s"uzen¤$abl csukva"  // ajaxstatusz¤ nem jó, mert felülíródik
+  }
+
+  def ablakUjLap (abl: String) = 
+  {
+    lap = new WeblapSe(this)
+    tartosWeblapok += lap.getInicPill.toEpochMilli -> lap
+    lap.feldolg() + s"¤uzen¤$abl: új lap: ${lap.getInicPill.toEpochMilli}"
   }
 
   def statusz: scala.xml.Elem    //ezeket a Sajat*Driver osztályokban kell implementálni... vagy itt lehet egy default implementáció
