@@ -14,6 +14,8 @@ import collection.JavaConverters._
 
 import models.WeblapModell
 
+import WeblapSe._ // az objektum tagjai, pl. feldolgHtml, wParamUjra
+
 class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) extends WeblapSeJ(wParams, dr)
 {
   //super(wParams, dr) nem kell, az extends-be kell írni
@@ -54,7 +56,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 
   //linkek = linkek(); WeblapSeJ::linkek() baromi lassú
   linkek = """majd egyszer... ("eventuálisan!")"""
-  var linkekList = linkekListFeltolt //driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
+  var linkekList = linkedListFn //driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
   linkek = linkekList.map(elembolHtml).foldLeft("")(_+_)
   /***/ println(s"${Console.CYAN}linkekList kész: ${linkekList.size} db elem ${Instant.now}${Console.RESET}")
 
@@ -70,7 +72,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 
   var kukik = driver.manage.getCookies.asScala
 
-  inicEredm = "¤ajaxfeldolg¤" + WeblapSe.feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
+  inicEredm = inicEredmFn  //függvénybe, ami felülírható
 
 //////// KONSTRUKTOR idáig; innentől csak def-ek  vannak
 
@@ -113,9 +115,11 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
   def kattintaniValok() =
     "kattintanivalók"
 
-  def linkekListFeltolt = driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
+  def linkedListFn = driver.findElements(By.cssSelector("a[href], [onclick]")).asScala
 
-  def linkekListFrissit = linkekList = linkekListFeltolt
+  def linkedListTarol = linkekList = linkedListFn
+
+  def inicEredmFn = "¤ajaxfeldolg¤" + feldolgHtml + "¤lapcim¤" + <pre>Lapcím: {lapcim}</pre>
 
   override def seInic = {}  // ezt a baromságot kiveszem innét
 
@@ -124,14 +128,14 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
  */
   def this (w1: WeblapSe)
   {
-    this(WeblapSe.wParamUjra(w1.url, w1.s), w1.driver)
+    this(wParamUjra(w1.url, w1.s), w1.driver)
   }
 /*
  * Másodlagos konstruktor a már böngészőbe betöltött laphoz
  */
   def this (dr: SajatDriver)
   {
-    this(WeblapSe.wParamUjra("", "Se"), dr)
+    this(wParamUjra("", "Se"), dr)
   }
 
   def klon = // duplikátum új böngészőablakba, új WeblapModell.tartosWeblapok elembe
@@ -230,7 +234,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
       {
         /* if (stale) */
         {
-          linkekListFrissit
+          linkedListTarol
           driver.executeScript(s"history.replaceState({lap: ${inicPill.toEpochMilli}}, '');")  //ugyanis ez is eltűnik ilyenkor
         } 
         simaFeldolg
@@ -284,10 +288,26 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
 
 object WeblapSe
 {
+  def fulElem (inputID: String, divID: String, szoveg: String, pipa: Boolean = false)/*: scala.xml.Elem*/ =
+    <div class="tab">
+      <input name="checkbox-tabs-group" type="radio" id={inputID} class="checkboxtab" checked={if (pipa) Some(xml.Text("pipa")) else None}></input>
+      <label for={inputID}>{szoveg}</label>
+      <div id={divID} class="content" style="overflow-y: auto;">
+      </div>
+    </div>
+     // a null-kerülési kényszer miatt ilyen a checked ...meg amiatt, hogy az egész xml.Elem, ahelyett, hogy String lenne
+    // ha tényleg csak az első/pipázott fülnek kell "overflow-y: auto"-nak lennie (mint ahogy a fulElem függvényesítés előtt volt), akkor:
+    //      <div id={divID} class="content" style={if (pipa) Some(xml.Text("overflow-y: auto;")) else None}>
+
   val feldolgHtml/*: scala.xml.Elem*/ =  //ez megy inic-kor az ajaxfeldolg-ba, és a feldolg ennek részeibe ír
 <div>
   <pre id="lapcim"></pre>
     <div class="tabs">
+    {fulElem("linkbox", "linkek", "Linkek", pipa=true)}
+    {fulElem("kattbox", "kattintanivalok", "Kattintanivalók")}
+    {fulElem("kepbox", "kep", "Kép")}
+    {fulElem("forrbox", "forras", "Forrás")}
+<!-- /*
     <div class="tab">
       <input name="checkbox-tabs-group" type="radio" id="checkbox10" class="checkboxtab" checked=""></input>
       <label for="checkbox10">Linkek</label>
@@ -315,6 +335,7 @@ object WeblapSe
       <div id="forras" class="content">
       </div>
     </div>
+*/ -->
   </div>
 </div>
 

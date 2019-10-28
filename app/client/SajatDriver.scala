@@ -96,8 +96,8 @@ trait SajatDriver extends WebDriver with JavascriptExecutor with TakesScreenshot
     if (tartosWeblapok.contains(aktHistStatLap))
     {
       val lap = tartosWeblapok(aktHistStatLap).asInstanceOf[WeblapSe]
-      lap.linkekListFrissit
-      lap.feldolg() + s"¤uzen¤$abl frissítve (go() és linkekListFrissit)"
+      lap.linkedListTarol
+      lap.feldolg() + s"¤uzen¤$abl frissítve (go() és linkedListTarol)"
     }
     else s"uzen¤nincs $aktHistStatLap a listában"
   }
