@@ -61,6 +61,7 @@ public class Weblap
       wParams.put("url", new String[] {"https://www.scribd.com/document/397870947/Gramatica-Quechua-Junin-Huanca-Rodolfo-Cerron-Palomino"});
       return new WeblapSeCP(wParams, SajatDriver.meghajtoNyit(SajatDriver.aktMeghajtoTipus()));
     default: return new Weblap(wParams);
+    case "SeEro": return new WeblapSeEro(wParams, SajatDriver.meghajtoNyit(SajatDriver.aktMeghajtoTipus()));
     }
   }
 

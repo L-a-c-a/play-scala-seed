@@ -14,7 +14,7 @@ import collection.JavaConverters._
 
 import models.WeblapModell
 
-import WeblapSe._ // az objektum tagjai, pl. feldolgHtml, wParamUjra
+import WeblapSe._ // a társobjektum tagjai, pl. feldolgHtml, wParamUjra
 
 class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) extends WeblapSeJ(wParams, dr)
 {
@@ -257,7 +257,6 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
         {reszletesStatusz}
       </div>
     </div>
-/*"a hülye atom miatt*/
 
   def reszletesStatusz =
     <div>inicPill={inicPill}</div>
@@ -268,22 +267,6 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     <div>histSorsz={histSorsz}</div>
     <div>{kukik.map(k => <div>{k.toString}</div>)}</div>
 
-/*
-  override //üres ős a Weblap-ban
-  def katt =
-  {
-
-    inicPill + " meg van kattintva"
-  }
-
-  override //üres ős a Weblap-ban
-  def katt (xpath: String) =
-  {
-    //new WeblapSe(this)
-    //driver.findElement(org.openqa.selenium.By.xpath(xpath)).click
-    inicPill + " meg van kattintva, xpath=" + xpath
-  }
-*/
 }
 
 object WeblapSe
@@ -302,40 +285,11 @@ object WeblapSe
   val feldolgHtml/*: scala.xml.Elem*/ =  //ez megy inic-kor az ajaxfeldolg-ba, és a feldolg ennek részeibe ír
 <div>
   <pre id="lapcim"></pre>
-    <div class="tabs">
+  <div class="tabs">
     {fulElem("linkbox", "linkek", "Linkek", pipa=true)}
     {fulElem("kattbox", "kattintanivalok", "Kattintanivalók")}
     {fulElem("kepbox", "kep", "Kép")}
     {fulElem("forrbox", "forras", "Forrás")}
-<!-- /*
-    <div class="tab">
-      <input name="checkbox-tabs-group" type="radio" id="checkbox10" class="checkboxtab" checked=""></input>
-      <label for="checkbox10">Linkek</label>
-      <div id="linkek" class="content" style="overflow-y: auto;">
-      </div>
-    </div>
-
-    <div class="tab">
-      <input name="checkbox-tabs-group" type="radio" id="checkbox15" class="checkboxtab"></input>
-      <label for="checkbox15">Kattintanivalók</label>
-      <div id="kattintanivalok" class="content">
-      </div>
-    </div>
-
-    <div class="tab">
-      <input name="checkbox-tabs-group" type="radio" id="checkbox20" class="checkboxtab"></input>
-      <label for="checkbox20">Kép</label>
-      <div id="kep" class="content">
-      </div>
-    </div>
-
-    <div class="tab">
-      <input name="checkbox-tabs-group" type="radio" id="checkbox30" class="checkboxtab"></input>
-      <label for="checkbox30">Forrás</label>
-      <div id="forras" class="content">
-      </div>
-    </div>
-*/ -->
   </div>
 </div>
 
