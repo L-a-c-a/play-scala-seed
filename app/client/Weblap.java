@@ -1,6 +1,7 @@
 package client;
 
 import java.util.Map;
+import java.time.Instant;
 
 public class Weblap
 {
@@ -12,9 +13,9 @@ public class Weblap
   String s = "";
   public String getS() { return s; }
 
-  java.time.Instant inicPill = java.time.Instant.ofEpochMilli(0L);
-  public void setInicPill(java.time.Instant pill) { inicPill = pill; }
-  public java.time.Instant getInicPill() { return inicPill; }
+  Instant inicPill = Instant.ofEpochMilli(0L);
+  public void setInicPill(Instant pill) { inicPill = pill; }
+  public Instant getInicPill() { return inicPill; }
 
   public String getInicEredm() { return ""; }   //majd a leszármazottban csinál valamit
 
@@ -65,4 +66,14 @@ public class Weblap
     }
   }
 
+  public static Map<String, String[]> wParamUjra (String pUrl, String pS) { return wParamUjra(pUrl, pS, Instant.now()); }
+
+  public static Map<String, String[]> wParamUjra (String pUrl, String pS, Instant pPill)
+  {
+    Map<String, String[]> wp = new java.util.HashMap<>();
+    wp.put("url", new String[]{ pUrl });
+    wp.put("s", new String[]{ pS });
+    wp.put("pill", new String[]{ pPill.toEpochMilli()+"" });
+    return wp;
+  }
 }

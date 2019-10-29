@@ -14,7 +14,7 @@ import collection.JavaConverters._
 
 import models.WeblapModell
 
-import WeblapSe._ // a társobjektum tagjai, pl. feldolgHtml, wParamUjra
+import Weblap._  // wParamUjra miatt (enélkül csak Weblap.wParamUjra -ként lehet hivatkozni rá)
 
 class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) extends WeblapSeJ(wParams, dr)
 {
@@ -103,7 +103,7 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     if (relHref.replaceAll("/", "") != absHref.replaceAll("/", "")) absHrefHa = s"($absHref)"
     var gombHa = s"""<button class=alacsonygomb onclick='inicajaxhivas("weblapajaxinic?url=$absHref&s=$s")'>nyomjad</button>"""
     if (relHref == "[nincs href]") gombHa = "<button class=alacsonygomb disabled>ne nyomjad</button>"
-    val onclickTmp = s"""feldolgajaxhivas(${inicPill.toEpochMilli}, "&muvelet=lapReszl&par=${linkekList.indexOf(elem)}"); document.querySelector("#checkbox15").click()"""
+    val onclickTmp = s"""feldolgajaxhivas(${inicPill.toEpochMilli}, "&muvelet=lapReszl&par=${linkekList.indexOf(elem)}"); document.querySelector("#kattbox").click()"""
     val reszlGomb = s"<button class=alacsonygomb onclick='$onclickTmp'>több</button>"
     s"<div>$relHref $absHrefHa $gombHa $reszlGomb</div>"
   }
@@ -267,10 +267,6 @@ class WeblapSe (wParams: java.util.Map[String, Array[String]], dr: SajatDriver) 
     <div>histSorsz={histSorsz}</div>
     <div>{kukik.map(k => <div>{k.toString}</div>)}</div>
 
-}
-
-object WeblapSe
-{
   def fulElem (inputID: String, divID: String, szoveg: String, pipa: Boolean = false)/*: scala.xml.Elem*/ =
     <div class="tab">
       <input name="checkbox-tabs-group" type="radio" id={inputID} class="checkboxtab" checked={if (pipa) Some(xml.Text("pipa")) else None}></input>
@@ -282,7 +278,7 @@ object WeblapSe
     // ha tényleg csak az első/pipázott fülnek kell "overflow-y: auto"-nak lennie (mint ahogy a fulElem függvényesítés előtt volt), akkor:
     //      <div id={divID} class="content" style={if (pipa) Some(xml.Text("overflow-y: auto;")) else None}>
 
-  val feldolgHtml/*: scala.xml.Elem*/ =  //ez megy inic-kor az ajaxfeldolg-ba, és a feldolg ennek részeibe ír
+  def feldolgHtml/*: scala.xml.Elem*/ =  //ez megy inic-kor az ajaxfeldolg-ba, és a feldolg ennek részeibe ír
 <div>
   <pre id="lapcim"></pre>
   <div class="tabs">
@@ -292,13 +288,4 @@ object WeblapSe
     {fulElem("forrbox", "forras", "Forrás")}
   </div>
 </div>
-
-  def wParamUjra (pUrl: String, pS: String, pPill: Instant = Instant.now): java.util.Map[String, Array[String]] =
-  {
-    var wp: java.util.Map[String, Array[String]] = new java.util.HashMap()
-    wp.put("url", Array(pUrl))
-    wp.put("s", Array(pS))
-    wp.put("pill", Array(pPill.toEpochMilli.toString))
-    wp
-  }
 }

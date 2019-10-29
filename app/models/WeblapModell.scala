@@ -92,7 +92,7 @@ object WeblapModell
     ret += s"<div><span id=idoLong>$pill</span> <span id=idoISO>$pillInstant</span></div>"
     ret += /*"<pre>" +*/ lap.getInicEredm //+ "</pre>"
     //***/ println(s"${Console.GREEN}inicAjax kész: ${Instant.now}; ${ret take 50}...${ret takeRight 50}${Console.RESET}")
-    /***/ println(s"${Console.GREEN}inicAjax kész: ${Instant.now}; ${ret.replaceFirst("tva<div>.*¤lapcim", "tva...\n...¤lapcim")}${Console.RESET}")
+    /***/ println(s"${Console.GREEN}inicAjax kész: ${Instant.now}; ${ret.replaceFirst("(?s)tva<div>.*¤lapcim", "tva...\n...¤lapcim")}${Console.RESET}")
     folyamatban = None
     ret
   }
@@ -100,7 +100,7 @@ object WeblapModell
   def feldolg /*(wParams: Map[String, Array[String]]): String*/ = lap.feldolg()
   // de valsz. nem kell neki a paraméter, mert már az inic-kor eltette magának
 
-  def feldolg(pill: Long, muvelet: String, par: String): String =   //ezt hívja weblapajaxfeldolg.scala.html
+  def feldolg(pill: Long, muvelet: String, par: String): String =   //ezt hívja weblapajaxfeldolgoz.scala.html
   {
     /***/ println(s"""${Console.YELLOW}${Console.BOLD}feldolg($pill, "$muvelet", "$par") hívva${Console.RESET}""")
     val ablakMuvRegex = "ablak(.*)".r  // pl. ablakCsuk --> case ablakMuvRegex(muv) => fn(muv)  --> fn("Csuk")

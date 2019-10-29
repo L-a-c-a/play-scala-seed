@@ -68,7 +68,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   def weblapAjaxFeldolg(pill: String, muvelet: String, par: String) = Action
   { implicit request =>
-    Ok(views.html.weblapajaxfeldolg(pill, muvelet, par))
+    Ok(views.html.weblapajaxfeldolgoz(pill, muvelet, par))
   }
 
 }
